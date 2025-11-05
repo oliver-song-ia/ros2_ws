@@ -1,0 +1,5 @@
+Spawn Tom -2.3 -10.3 0 0
+Tom GoTo -2.3 -6.2 0 0
+Tom GoTo -2.3 -10.3 0 180
+Tom GoTo -0.4 -8 0 0
+Tom Sit /World/house/Objects/Sofa_3_0_1 10000

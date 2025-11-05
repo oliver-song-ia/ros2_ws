@@ -1,0 +1,54 @@
+# test_swerve_drive_controller:
+#   ros__parameters:
+#     update_rate: 10 #Hz
+
+#     joint_state_broadcaster:
+#       type: joint_state_broadcaster/JointStateBroadcaster
+
+#     swerve_drive_controller:
+#       type: swerve_drive_controller/SwerveController
+
+controller_manager:
+  ros__parameters:
+    update_rate: 10  # Hz
+
+    swerve_drive_controller:
+      type: swerve_drive_controller/SwerveController
+
+swerve_drive_controller:
+  ros__parameters:
+
+    front_left_wheel_joint: "lf_wheel_joint"
+    front_right_wheel_joint: "rf_wheel_joint"
+    rear_left_wheel_joint: "lb_wheel_joint"
+    rear_right_wheel_joint: "rb_wheel_joint"
+
+    front_left_axle_joint: "lf_steer_joint"
+    front_right_axle_joint: "rf_steer_joint"
+    rear_left_axle_joint: "lb_steer_joint"
+    rear_right_axle_joint: "rb_steer_joint"
+
+    # center_of_rotation: 0.01 # not used
+    wheel_x_offset: 0.495 # Chassis Center to Axle Center
+    wheel_y_offset: 0.264 # 7 # Axle Center to Wheel Center
+    wheel_radius: 0.08  # Radius of the wheels in meters
+    max_steering_angle: 3.14  # Maximum steering angle in radians
+    min_steering_angle: -3.14  # Minimum steering angle in radians
+
+
+    cmd_vel_timeout: 0.1  # 1/update_rate = 1/10Hz = 0.1s
+    use_stamped_vel: false
+    odom: odom
+    base_footprint: base_footprint
+    publishe_rate: 50.0
+    enable_odom_tf: true
+    open_loop: true
+
+    velocity_threshold: 10.0 # angular velocity of the wheel, in rad/s. 50 is about 4.25 m/s
+    # front_right_velocity_threshold: 50.0
+    # rear_left_velocity_threshold: 50.0
+    # rear_right_velocity_threshold: 50.0
+
+
+    pose_covariance_diagonal : [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]

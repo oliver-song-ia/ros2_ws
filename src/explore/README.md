@@ -1,0 +1,1 @@
+要先开启导航和move_base,底盘，lidar，slam建图，最后开启explore

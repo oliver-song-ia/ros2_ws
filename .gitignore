@@ -1,0 +1,33 @@
+# ROS2 build artifacts
+build/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# PDF and generated files
+*.pdf
+*.gv
+
+# Shell scripts in root (keep only src folder)
+*.sh

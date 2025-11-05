@@ -1,0 +1,71 @@
+# test_swerve_drive_controller:
+#   ros__parameters:
+#     update_rate: 10 #Hz
+
+#     joint_state_broadcaster:
+#       type: joint_state_broadcaster/JointStateBroadcaster
+
+#     swerve_drive_controller:
+#       type: swerve_drive_controller/SwerveController
+
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    swerve_drive_controller:
+      type: swerve_drive_controller/SwerveController
+
+    upper_body_controller:
+      type: position_controllers/JointGroupPositionController
+
+swerve_drive_controller:
+  ros__parameters:
+
+    front_left_wheel_joint: "Leg_front_left_1"
+    front_right_wheel_joint: "Leg_front_right_1"
+    rear_left_wheel_joint: "Leg_back_left_1"
+    rear_right_wheel_joint: "Leg_back_right_1"
+
+    front_left_axle_joint: "Leg_front_left_2"
+    front_right_axle_joint: "Leg_front_right_2"
+    rear_left_axle_joint: "Leg_back_left_2"
+    rear_right_axle_joint: "Leg_back_right_2"
+
+    # center_of_rotation: 0.01 # not used
+    wheel_x_offset: 0.5 # Chassis Center to Axle Center
+    wheel_y_offset: 0.25227 # Axle Center to Wheel Center
+    wheel_radius: 0.085  # Radius of the wheels in meters
+    max_steering_angle: 1.57079632679  # Maximum steering angle in radians
+    min_steering_angle: -1.57079632679  # Minimum steering angle in radians
+
+
+    cmd_vel_timeout: 10.0
+    use_stamped_vel: false
+    odom: odom
+    base_footprint: base_footprint
+    publishe_rate: 50.0
+    enable_odom_tf: true
+    open_loop: false
+
+    velocity_threshold: 50.0 # angular velocity of the wheel, in rad/s. 50 is about 4.25 m/s
+    steering_angle_tolerance: 0.1 # rad. Maximum acceptable error between commanded and actual steering angle.
+    # Wheel velocity will be scaled down when error exceeds this threshold to prevent wheel scrubbing.
+    max_steering_error_for_zero_velocity: 0.5 # rad. Steering angle error at which wheel velocity is reduced to zero.
+    # Velocity scales linearly between steering_angle_tolerance and this value.
+
+    pose_covariance_diagonal : [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+
+
+upper_body_controller:
+  ros__parameters:
+    joints:
+      - "CHEST1"
+      - "ARM0_LEFT"
+      - "ARM1_LEFT"
+      - "ARM2_LEFT"
+      - "ARM3_LEFT"
+      - "ARM0_RIGHT"
+      - "ARM1_RIGHT"
+      - "ARM2_RIGHT"
+      - "ARM3_RIGHT"
