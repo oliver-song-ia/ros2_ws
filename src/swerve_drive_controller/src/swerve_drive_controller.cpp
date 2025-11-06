@@ -31,8 +31,8 @@ namespace
 
 constexpr auto DEFAULT_COMMAND_TOPIC = "/cmd_vel";
 constexpr auto DEFAULT_COMMAND_UNSTAMPED_TOPIC = "/cmd_vel";  // "/cmd_vel_unstamped";
-constexpr auto DEFAULT_ODOMETRY_TOPIC = "~/odom";  // not used in sim
-constexpr auto DEFAULT_TRANSFORM_TOPIC = "~/tf";  // not used in sim
+constexpr auto DEFAULT_ODOMETRY_TOPIC = "/odom";  // not used in sim
+constexpr auto DEFAULT_TRANSFORM_TOPIC = "/tf";  // not used in sim
 
 }  // namespace
 
