@@ -466,6 +466,8 @@ controller_interface::return_type SwerveController::update(
   std::array<double, 4> velocity_array{}; // should be angular velocities in rad/s
   std::array<double, 4> steering_angle_array{};
 
+  // VALIDATED: data successfully passed from /robot/joint_states 
+  // into velocity and steering angle array
   for (std::size_t i = 0; i < 4; ++i)
   {
     if (params_.open_loop)

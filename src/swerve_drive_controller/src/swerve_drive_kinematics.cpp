@@ -13,6 +13,7 @@
 
 #include "swerve_drive_controller/swerve_drive_kinematics.hpp"
 #include "rclcpp/logging.hpp"
+#include <iomanip>
 
 namespace swerve_drive_controller
 {
@@ -102,7 +103,7 @@ bool SwerveDriveKinematics::clip_steering_angle(std::array<WheelCommand, 4> & wh
  * 使用航位推算法（Dead Reckoning）计算机器人在世界坐标系中的位置和朝向
  * 基于四轮全向移动机器人的运动学模型
  * 
- * @param wheel_velocities 4个轮子的角速度（rad/s）
+ * @param wheel_velocities 4个轮子的线速度（m/s）
  * @param steering_angles 4个轮子的转向角（rad）
  * @param dt 时间步长（秒）
  * @return 更新后的里程计状态（位置x,y和朝向角theta）
@@ -118,11 +119,9 @@ OdometryState SwerveDriveKinematics::update_odometry(
   // 遍历4个轮子，计算每个轮子对机器人运动的贡献
   for (std::size_t i = 0; i < 4; i++)
   {
-    // 将轮子的角速度转换为线速度，并根据转向角分解到x和y方向
-    // vx = ω * r * cos(δ)  - 轮子x方向的线速度分量
-    // vy = ω * r * sin(δ)  - 轮子y方向的线速度分量
-    double vx = wheel_velocities[i] * std::cos(steering_angles[i]) * wheel_radius_;
-    double vy = wheel_velocities[i] * std::sin(steering_angles[i]) * wheel_radius_;
+    // 下位机发布的速度已经是线速度，不需要再乘轮子半径
+    double vx = wheel_velocities[i] * std::cos(steering_angles[i]);
+    double vy = wheel_velocities[i] * std::sin(steering_angles[i]);
 
     // 累加所有轮子对线性速度的贡献（后续取平均）
     vx_sum += vx;
