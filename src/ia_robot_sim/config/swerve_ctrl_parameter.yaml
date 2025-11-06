@@ -42,7 +42,7 @@ swerve_drive_controller:
     base_footprint: base_footprint
     publishe_rate: 50.0
     enable_odom_tf: true
-    open_loop: true
+    open_loop: false
 
     velocity_threshold: 10.0 # angular velocity of the wheel, in rad/s. 50 is about 4.25 m/s
     # front_right_velocity_threshold: 50.0

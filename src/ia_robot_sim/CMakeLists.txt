@@ -37,4 +37,10 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+# Install Python executables
+install(PROGRAMS
+  scripts/joint_states_remapper.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
