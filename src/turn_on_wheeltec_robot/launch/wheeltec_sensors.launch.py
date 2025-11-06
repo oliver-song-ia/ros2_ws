@@ -79,10 +79,32 @@ def generate_launch_description():
         # 如果需要加载特定配置文件，可以添加以下参数
         arguments=['-d', os.path.join(bringup_dir, 'rviz', 'laser_2d.rviz')]
     )
+
+    # Joint States Remapper - 将 /joint_states 转换为 /robot/joint_states
+    # 映射关系:
+    # Leg_front_left_2  -> lf_steer_joint  (转向)
+    # Leg_front_right_2 -> rf_steer_joint  (转向)
+    # Leg_back_left_2   -> lb_steer_joint  (转向)
+    # Leg_back_right_2  -> rb_steer_joint  (转向)
+    # Leg_front_left_1  -> lf_wheel_joint  (轮速)
+    # Leg_front_right_1 -> rf_wheel_joint  (轮速)
+    # Leg_back_left_1   -> lb_wheel_joint  (轮速)
+    # Leg_back_right_1  -> rb_wheel_joint  (轮速)
+    joint_states_remapper_node = launch_ros.actions.Node(
+        package='ia_robot_sim',
+        executable='joint_states_remapper.py',
+        name='joint_states_remapper',
+        output='screen',
+        parameters=[
+            {'use_sim_time': use_sim_time}
+        ]
+    )
+
     return LaunchDescription([
         wheeltec_robot,
         lidar_ros,
         ahrs_launch,
+        joint_states_remapper_node,  # 添加 joint states 转换节点
         swerve_ctrl,
         safety_system_launch,
         # twist_mux_node,
