@@ -1,9 +1,0 @@
-{
-  "robot_dimensions": {
-    "length": 0.5,
-    "width": 0.3
-  },
-  "map_resolution": 0.05,
-  "confirmed_alignment_points": [
-  ]
-}
