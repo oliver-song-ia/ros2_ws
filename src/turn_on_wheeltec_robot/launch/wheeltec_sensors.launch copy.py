@@ -12,10 +12,9 @@ from launch.conditions import IfCondition
 #def launch(launch_descriptor, argv):
 def generate_launch_description():
     bringup_dir = get_package_share_directory('turn_on_wheeltec_robot')
-    swerve_ctrl_dir = get_package_share_directory('ia_robot_sim')
     ia_robot_dir = get_package_share_directory('ia_robot')
     use_sim_time = LaunchConfiguration('use_sim_time', default='False')
-    swerve_ctrl_launch_dir = os.path.join(swerve_ctrl_dir, 'launch')
+    swerve_ctrl_launch_dir = os.path.join(ia_robot_dir, 'launch')
     launch_dir = os.path.join(bringup_dir, 'launch')
     wheeltec_robot = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'turn_on_wheeltec_robot.launch.py')),
@@ -31,9 +30,8 @@ def generate_launch_description():
         ])
     )
 
-# # ros2 launch ia_robot_sim swerve_ctrl.launch.py
     swerve_ctrl = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(os.path.join(swerve_ctrl_launch_dir, 'swerve_ctrl.launch.py')),
+            PythonLaunchDescriptionSource(os.path.join(swerve_ctrl_launch_dir, 'ctrl_swerve_drive.launch.py')),
     )
 
     # Include safety system (ultrasonic emergency stop + twist_mux)
@@ -84,8 +82,8 @@ def generate_launch_description():
         lidar_ros,
         ahrs_launch,
         swerve_ctrl,
-        safety_system_launch,
-        twist_mux_node,
+        # safety_system_launch, # TODO: modify nav2 output topic to make safety system working
+        # twist_mux_node,
         # rviz_node
         ]
     )
