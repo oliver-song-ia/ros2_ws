@@ -14,7 +14,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('ia_cartographer')
+    bringup_dir = get_package_share_directory('nav2_bringup')
     ia_robot_dir = get_package_share_directory('ia_robot')
     
     # Get config files
@@ -33,7 +33,7 @@ def generate_launch_description():
     # Declare the launch arguments
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(get_package_share_directory('ia_cartographer'), 'maps', 'ia_map.yaml'),
+        default_value=os.path.join(get_package_share_directory('ia_robot_sim'), 'maps', 'ia_map.yaml'),
         description='Full path to the ROS2 map yaml file to use')
 
     declare_params_file_cmd = DeclareLaunchArgument(

@@ -26,7 +26,7 @@ class OdomVisualizer(Node):
         # Subscribe to topics
         self.odom_sub = self.create_subscription(
             Odometry,
-            '/swerve_drive_controller/odom',
+            '/odom',
             self.odom_callback,
             10
         )
@@ -65,7 +65,7 @@ class OdomVisualizer(Node):
         self.integration_timer = self.create_timer(0.02, self.integration_callback)
 
         self.get_logger().info('Odom Visualizer started!')
-        self.get_logger().info('Subscribed to: /swerve_drive_controller/odom, /cmd_vel')
+        self.get_logger().info('Subscribed to: /odom, /cmd_vel')
 
     def odom_callback(self, msg):
         """Handle odometry data"""

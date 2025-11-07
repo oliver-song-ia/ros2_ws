@@ -55,14 +55,14 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
-      Description File: /home/ia/works/isaac_nav/src/ia_robot_sim/description/robot2.urdf
-      Description Source: File
+      Description File: ""
+      Description Source: Topic
       Description Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: ""
+        Reliability Policy: Best Effort
+        Value: /robot_description
       Enabled: true
       Links:
         All Links Enabled: true
