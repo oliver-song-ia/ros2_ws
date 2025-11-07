@@ -425,14 +425,14 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status(const sensor_msgs::msg::Jo
   send_data[8] = (uint8_t)(speed_data/256);
   send_data[9] = (uint8_t)(speed_data);
   send_data[10] = 0x64;   //加速度
-  speed = WHEEL_FRONT_RIGHT*(staus->velocity[2])*60/round;  //转换为m/s
+  speed = WHEEL_REAR_LEFT*(staus->velocity[2])*60/round;  //转换为m/s
   speed_data = static_cast<int>(speed);
   send_data[11] = 0x01;    //使能
   send_data[12] = 0x01;
   send_data[13] = (uint8_t)(speed_data/256);
   send_data[14] = (uint8_t)(speed_data);
   send_data[15] = 0x64;   //加速度
-  speed = WHEEL_REAR_LEFT*(staus->velocity[1])*60/round;  //转换为m/s
+  speed = WHEEL_FRONT_RIGHT*(staus->velocity[1])*60/round;  //转换为m/s
   speed_data = static_cast<int>(speed);
   send_data[16] = 0x01;    //使能
   send_data[17] = 0x01;
@@ -1327,13 +1327,14 @@ void turn_on_robot::Robot_Data_Deal(char* data,int len){
     if(data[6]==0x11){
       robot_joint_status.velocity[15] = WHEEL_FRONT_LEFT*Odom_Trans(data[9],data[10])*160.0/60.0;
       robot_joint_status.position[15] = 0;
-      robot_joint_status.velocity[16] = WHEEL_FRONT_RIGHT*Odom_Trans(data[11],data[12])*160.0/60.0;
-      robot_joint_status.position[16] = 0;
-      joint_publish_flag |=0x30000;
-    }else{
       robot_joint_status.velocity[17] = WHEEL_REAR_LEFT*Odom_Trans(data[9],data[10])*160.0/60.0;
       robot_joint_status.position[17] = 0;
-      robot_joint_status.velocity[18] = WHEEL_REAR_LEFT*Odom_Trans(data[11],data[12])*160.0/60.0;
+      
+      joint_publish_flag |=0x30000;
+    }else{
+      robot_joint_status.velocity[16] = WHEEL_FRONT_RIGHT*Odom_Trans(data[11],data[12])*160.0/60.0;
+      robot_joint_status.position[16] = 0;
+      robot_joint_status.velocity[18] = WHEEL_REAR_RIGTH*Odom_Trans(data[11],data[12])*160.0/60.0;
       robot_joint_status.position[18] = 0;
       joint_publish_flag |=0xc0000;
     }

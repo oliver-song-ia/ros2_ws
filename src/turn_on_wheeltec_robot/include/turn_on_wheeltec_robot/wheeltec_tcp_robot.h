@@ -134,8 +134,8 @@ typedef struct
 #define IA_NEW_ROBOT
 #ifdef IA_NEW_ROBOT
 #define WHEEL_FRONT_LEFT -1.0
-#define WHEEL_FRONT_RIGHT -1.0
-#define WHEEL_REAR_LEFT 1.0
+#define WHEEL_REAR_LEFT -1.0
+#define WHEEL_FRONT_RIGHT 1.0
 #define WHEEL_REAR_RIGTH 1.0
 
 #define JOINT_DATA_PUB 0x000f3fff		//高16位为四个轮子 低16位为关节

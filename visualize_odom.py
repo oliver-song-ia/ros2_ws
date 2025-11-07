@@ -195,6 +195,11 @@ def animate_plots(visualizer):
     ax1.legend(loc='upper right', fontsize=12)
     ax2.legend(loc='upper right', fontsize=12)
 
+    ax1.set_xlim(-2, 2)  # Set X-axis limits
+    ax1.set_ylim(-2, 2)  # Set Y-axis limits
+    ax2.set_xlim(-2, 2)  # Set X-axis limits
+    ax2.set_ylim(-2, 2)  # Set Y-axis limits
+
     def init():
         """Initialize plots"""
         return []
