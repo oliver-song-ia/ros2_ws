@@ -10,7 +10,7 @@
   <depend>launch</depend>
   <depend>launch_ros</depend>
   <depend>wheeltec_slam_toolbox</depend>
-  <depend>ia_robot_sim</depend>
+  <depend>ia_robot</depend>
   <depend>explore_lite</depend>
 
   <test_depend>ament_copyright</test_depend>

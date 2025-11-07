@@ -1,0 +1,3 @@
+[submodule "src/ia_robot_ros"]
+	path = src/ia_robot_ros
+	url = git@github.com:Intuitive-Autonomy/ia_robot_ros.git

@@ -16,15 +16,15 @@ def generate_launch_description():
         # 启动Swerve控制器
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                get_package_share_directory('ia_robot_sim'),
-                '/launch/swerve_ctrl.launch.py'
+                get_package_share_directory('ia_robot'),
+                '/launch/ctrl_swerve_drive.launch.py'
             ])
         ),
         
         # 启动导航系统
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                get_package_share_directory('ia_robot_sim'),
+                get_package_share_directory('ia_robot'),
                 '/launch/nav2_with_alignment.launch.py'
             ]),
             launch_arguments={

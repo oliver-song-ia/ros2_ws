@@ -28,22 +28,22 @@ def generate_launch_description():
     # Declare the launch arguments
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(get_package_share_directory('ia_robot_sim'), 'maps', 'ia_map.yaml'),
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'maps', 'ia_map.yaml'),
         description='Full path to the ROS2 map yaml file to use')
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(get_package_share_directory('ia_robot_sim'), 'config', 'nav2_params_real.yaml'),
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'config', 'nav2_params_real.yaml'),
         description='Full path to the ROS2 parameters file to use for all launched nodes')
 
     declare_alignment_points_file_cmd = DeclareLaunchArgument(
         'alignment_points_file',
-        default_value=os.path.join(get_package_share_directory('ia_robot_sim'), 'maps', 'map_0722_empty.json'),
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'maps', 'map_0722_empty.json'),
         description='Full path to the alignment points JSON file')
 
     declare_behavior_tree_file_cmd = DeclareLaunchArgument(
         'behavior_tree_file',
-        default_value=os.path.join(get_package_share_directory('ia_robot_sim'), 'behavior_trees', 'navigate_backup_first.xml'),
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'behavior_trees', 'navigate_backup_first.xml'),
         description='Full path to behavior tree xml file')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(

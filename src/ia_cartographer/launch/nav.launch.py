@@ -23,7 +23,7 @@ def generate_launch_description():
     
     declare_behavior_tree_file_cmd = DeclareLaunchArgument(
         'behavior_tree_file',
-        default_value=os.path.join(get_package_share_directory('ia_robot_sim'), 'behavior_trees', 'navigate_backup_first.xml'),
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'behavior_trees', 'navigate_backup_first.xml'),
         description='Full path to behavior tree xml file')
     # rviz
     rviz_config_dir = os.path.join(wheeltec_nav_dir, 'rviz')

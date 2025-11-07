@@ -12,10 +12,9 @@ from launch.conditions import IfCondition
 #def launch(launch_descriptor, argv):
 def generate_launch_description():
     bringup_dir = get_package_share_directory('turn_on_wheeltec_robot')
-    swerve_ctrl_dir = get_package_share_directory('ia_robot_sim')
     ia_robot_dir = get_package_share_directory('ia_robot')
     use_sim_time = LaunchConfiguration('use_sim_time', default='False')
-    swerve_ctrl_launch_dir = os.path.join(swerve_ctrl_dir, 'launch')
+    swerve_ctrl_launch_dir = os.path.join(ia_robot_dir, 'launch')
     launch_dir = os.path.join(bringup_dir, 'launch')
     wheeltec_robot = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'turn_on_wheeltec_robot.launch.py')),
@@ -31,9 +30,8 @@ def generate_launch_description():
         ])
     )
 
-# # ros2 launch ia_robot_sim swerve_ctrl.launch.py
     swerve_ctrl = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(os.path.join(swerve_ctrl_launch_dir, 'swerve_ctrl.launch.py')),
+            PythonLaunchDescriptionSource(os.path.join(swerve_ctrl_launch_dir, 'ctrl_swerve_drive.launch.py')),
     )
 
     # Include safety system (ultrasonic emergency stop + twist_mux)
@@ -91,7 +89,7 @@ def generate_launch_description():
     # Leg_back_left_1   -> lb_wheel_joint  (轮速)
     # Leg_back_right_1  -> rb_wheel_joint  (轮速)
     joint_states_remapper_node = launch_ros.actions.Node(
-        package='ia_robot_sim',
+        package='ia_robot',
         executable='joint_states_remapper.py',
         name='joint_states_remapper',
         output='screen',
@@ -106,7 +104,7 @@ def generate_launch_description():
         ahrs_launch,
         joint_states_remapper_node,  # 添加 joint states 转换节点
         swerve_ctrl,
-        safety_system_launch,
+        # safety_system_launch, # TODO: modify nav2 output topic to make safety system working
         # twist_mux_node,
         # rviz_node
         ]
