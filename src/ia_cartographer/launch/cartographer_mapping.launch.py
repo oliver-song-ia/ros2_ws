@@ -52,7 +52,6 @@ def generate_launch_description():
         arguments=['-d', rviz_config_dir],
         parameters=[{'use_sim_time': use_sim_time}],
         output='screen')
-# ros2 launch ia_robot_sim swerve_ctrl.launch.py
     
 
     #===============================================定义启动文件========================================================
