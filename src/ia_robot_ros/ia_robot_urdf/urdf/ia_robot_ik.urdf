@@ -1,0 +1,1518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     ========================================================================
+     INTUITIVE AUTONOMY CONFIDENTIAL
+     ========================================================================
+     This URDF file and all its contents are proprietary and confidential 
+     to Intuitive Autonomy. All designs, specifications, and technical data 
+     contained within this file are the exclusive property of Intuitive 
+     Autonomy and are protected by applicable intellectual property laws. 
+     Unauthorized use, reproduction, distribution, or disclosure is strictly 
+     prohibited.
+     ========================================================================
+-->
+<!-- added three virtual joints for inverse kinematics chassis movement -->
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="ia_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- World fixed frame -->
+  <link name="world"/>
+  
+  <!-- Virtual links for chassis movement -->
+  <link name="chassis_x_slider">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+    </inertial>
+  </link>
+  
+  <link name="chassis_y_slider">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+    </inertial>
+  </link>
+  
+  <link name="chassis_rotator">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+    </inertial>
+  </link>
+  
+  <!-- Chassis movement joints -->
+  <joint name="chassis_x_joint" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="world"/>
+    <child link="chassis_x_slider"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-2.0" upper="2.0" effort="1000" velocity="2.0"/>
+  </joint>
+  
+  <joint name="chassis_y_joint" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="chassis_x_slider"/>
+    <child link="chassis_y_slider"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.0" upper="2.0" effort="1000" velocity="2.0"/>
+  </joint>
+  
+  <joint name="chassis_rotation_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="chassis_y_slider"/>
+    <child link="chassis_rotator"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <joint
+    name="base_to_chassis"
+    type="fixed">
+    <origin
+      xyz="0 0 0.6"
+      rpy="0 0 3.1415926" />
+    <parent
+      link="chassis_rotator" />
+    <child
+      link="base_link" />
+  </joint>
+  
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.022932 -0.005675 -0.087903"
+        rpy="0 0 0" />
+      <mass
+        value="15.862" />
+      <inertia
+        ixx="0.27465"
+        ixy="-7.1995E-06"
+        ixz="0.0050561"
+        iyy="0.13652"
+        iyz="-1.5511E-05"
+        izz="0.29154" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/base_link_col_left.STL" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/base_link_col_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- camera (all in one) -->
+  <link
+    name="camera_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.01" />
+      <inertia
+        ixx="0.000001"
+        ixy="0"
+        ixz="0"
+        iyy="0.000001"
+        iyz="0"
+        izz="0.000001" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+  </link>
+  <joint
+    name="base_to_camera"
+    type="fixed">
+    <origin
+      xyz="-0.1 0 -0.1"
+      rpy="0 -0.261799 3.14159" />
+      <!-- 15 degree tilt -->
+    <parent
+      link="base_link" />
+    <child
+      link="camera_link" />
+  </joint>
+
+  <!-- camera_0 -->
+  <link
+    name="camera_0">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.01" />
+      <inertia
+        ixx="0.000001"
+        ixy="0"
+        ixz="0"
+        iyy="0.000001"
+        iyz="0"
+        izz="0.000001" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+  </link>
+  <joint
+    name="cam_to_camera_0"
+    type="fixed">
+    <origin
+      xyz="0.0097820 0 0.0169428"
+      rpy="0 0.52359878 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="camera_0" />
+  </joint>
+  <!-- 120 deg between camera_0 and camera_1 -->
+
+  <!-- camera_1 -->
+  <link
+    name="camera_1">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.01" />
+      <inertia
+        ixx="0.000001"
+        ixy="0"
+        ixz="0"
+        iyy="0.000001"
+        iyz="0"
+        izz="0.000001" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+  </link>
+  <joint
+    name="cam_to_camera_1"
+    type="fixed">
+    <origin
+      xyz="0.0097820 0 -0.0169428"
+      rpy="0 -0.52359878 0" />
+    <parent
+      link="camera_link" />
+    <child
+      link="camera_1" />
+  </joint>
+  <!-- 120 deg between camera_0 and camera_1 -->
+
+  <!-- lidar_link -->
+  <link
+    name="lidar_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.01" />
+      <inertia
+        ixx="0.000001"
+        ixy="0"
+        ixz="0"
+        iyy="0.000001"
+        iyz="0"
+        izz="0.000001" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.02" length="0.01"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0 0 1" />
+      </material>
+    </visual>
+  </link>
+  <joint
+    name="base_to_lidar"
+    type="fixed">
+    <origin
+      xyz="0 0 -0.12"
+      rpy="0 1.570795 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="lidar_link" />
+  </joint>
+
+
+  <link
+    name="Leg_front_left_3">
+    <inertial>
+      <origin
+        xyz="-0.106921179827909 1.34423681352747E-07 0.0312269266405216"
+        rpy="0 0 0" />
+      <mass
+        value="0.339608633224089" />
+      <inertia
+        ixx="0.000285081649796005"
+        ixy="-1.82876956249044E-09"
+        ixz="0.000102591523351893"
+        iyy="0.00138279695289861"
+        iyz="2.4382893592623E-09"
+        izz="0.00146639605011016" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_left_3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_left_3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_front_left_3"
+    type="continuous">
+    <origin
+      xyz="-0.3 -0.265 -0.4179"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Leg_front_left_3" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_front_left_2">
+    <inertial>
+      <origin
+        xyz="-3.98980193327958E-09 -0.0395926660228376 -0.0221412692169536"
+        rpy="0 0 0" />
+      <mass
+        value="0.160516219278783" />
+      <inertia
+        ixx="0.000346919925332363"
+        ixy="-7.38943599484142E-12"
+        ixz="-6.09776438974598E-11"
+        iyy="0.000297809739672037"
+        iyz="-8.99151431354613E-05"
+        izz="0.000226898004300985" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_left_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_left_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_front_left_2"
+    type="continuous">
+    <origin
+      xyz="-0.2 0 -0.0001"
+      rpy="0 0 0" />
+    <parent
+      link="Leg_front_left_3" />
+    <child
+      link="Leg_front_left_2" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_front_left_1">
+    <inertial>
+      <origin
+        xyz="-4.35207425653061E-14 0.00050699503431334 0.000450936567174764"
+        rpy="0 0 0" />
+      <mass
+        value="1.3523641523137" />
+      <inertia
+        ixx="0.00255741368199038"
+        ixy="-3.45588112952504E-20"
+        ixz="2.11636302886032E-19"
+        iyy="0.00247259713085181"
+        iyz="-1.18061916955662E-05"
+        izz="0.00370225987559862" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_left_1_nocable.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_left_1_nocable.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_front_left_1"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.102"
+      rpy="1.5708 0 0" />
+    <parent
+      link="Leg_front_left_2" />
+    <child
+      link="Leg_front_left_1" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_front_right_3">
+    <inertial>
+      <origin
+        xyz="-0.106921169546996 1.37608200612149E-07 0.0312269186214842"
+        rpy="0 0 0" />
+      <mass
+        value="0.339608572174863" />
+      <inertia
+        ixx="0.000285081644276489"
+        ixy="-1.84657451407824E-09"
+        ixz="0.000102591533229327"
+        iyy="0.00138279694362171"
+        iyz="2.42694982875545E-09"
+        izz="0.00146639602013726" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_right_3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_right_3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_front_right_3"
+    type="continuous">
+    <origin
+      xyz="-0.3 0.265 -0.4179"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Leg_front_right_3" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_front_right_2">
+    <inertial>
+      <origin
+        xyz="3.98975996684925E-09 0.0395926660232229 -0.0221412692169544"
+        rpy="0 0 0" />
+      <mass
+        value="0.160516219278785" />
+      <inertia
+        ixx="0.000346919925332368"
+        ixy="-7.38943555595723E-12"
+        ixz="6.09776429861874E-11"
+        iyy="0.000297809739672043"
+        iyz="8.99151431354619E-05"
+        izz="0.000226898004300987" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_right_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_right_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_front_right_2"
+    type="continuous">
+    <origin
+      xyz="-0.2 0 -0.0001"
+      rpy="0 0 0" />
+    <parent
+      link="Leg_front_right_3" />
+    <child
+      link="Leg_front_right_2" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_front_right_1">
+    <inertial>
+      <origin
+        xyz="1.22124532708767E-15 0.00050699503431284 -0.000450936567562288"
+        rpy="0 0 0" />
+      <mass
+        value="1.3523641523137" />
+      <inertia
+        ixx="0.00255741368199038"
+        ixy="-9.99356513826864E-22"
+        ixz="-3.23508784905215E-21"
+        iyy="0.00247259713085182"
+        iyz="1.18061916955662E-05"
+        izz="0.00370225987559863" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_right_1_nocable.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_front_right_1_nocable.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_front_right_1"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.102"
+      rpy="1.5708 0 0" />
+    <parent
+      link="Leg_front_right_2" />
+    <child
+      link="Leg_front_right_1" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_back_left_2">
+    <inertial>
+      <origin
+        xyz="-3.98975832927029E-09 -0.0395926660232188 -0.0221412692169541"
+        rpy="0 0 0" />
+      <mass
+        value="0.160516219278784" />
+      <inertia
+        ixx="0.000346919925332368"
+        ixy="-7.38943538300035E-12"
+        ixz="-6.09776428262138E-11"
+        iyy="0.000297809739672041"
+        iyz="-8.99151431354623E-05"
+        izz="0.000226898004300987" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_left_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_left_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_back_left_2"
+    type="continuous">
+    <origin
+      xyz="0.5 -0.265 -0.418"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Leg_back_left_2" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_back_left_1">
+    <inertial>
+      <origin
+        xyz="0 0.000506995034313118 -0.000450936567555904"
+        rpy="0 0 0" />
+      <mass
+        value="1.3523641523137" />
+      <inertia
+        ixx="0.00255741368199038"
+        ixy="1.04385485722584E-20"
+        ixz="-1.10787857677583E-19"
+        iyy="0.00247259713085181"
+        iyz="1.18061916955651E-05"
+        izz="0.00370225987559862" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_left_1_nocable.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_left_1_nocable.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_back_left_1"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.102"
+      rpy="1.5708 0 3.1416" />
+    <parent
+      link="Leg_back_left_2" />
+    <child
+      link="Leg_back_left_1" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="Leg_back_right_2">
+    <inertial>
+      <origin
+        xyz="3.98975841253701E-09 0.0395926660232188 -0.0221412692169539"
+        rpy="0 0 0" />
+      <mass
+        value="0.160516219278783" />
+      <inertia
+        ixx="0.000346919925332365"
+        ixy="-7.38943539906526E-12"
+        ixz="6.09776427099678E-11"
+        iyy="0.000297809739672038"
+        iyz="8.99151431354616E-05"
+        izz="0.000226898004300986" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_right_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_right_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_back_right_2"
+    type="continuous">
+    <origin
+      xyz="0.5 0.265000000000002 -0.418000000000001"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Leg_back_right_2" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Leg_back_right_1">
+    <inertial>
+      <origin
+        xyz="0 0.000506995034313229 -0.00045093656755596"
+        rpy="0 0 0" />
+      <mass
+        value="1.3523641523137" />
+      <inertia
+        ixx="0.00255741368199038"
+        ixy="-1.05982737300211E-21"
+        ixz="-3.18483340293149E-21"
+        iyy="0.00247259713085182"
+        iyz="1.18061916955662E-05"
+        izz="0.00370225987559863" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_right_1_nocable.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/Leg_back_right_1_nocable.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Leg_back_right_1"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.102"
+      rpy="1.5708 0 0" />
+    <parent
+      link="Leg_back_right_2" />
+    <child
+      link="Leg_back_right_1" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="CHEST1">
+    <inertial>
+      <origin
+        xyz="-0.0064333 0.28526 -0.036079"
+        rpy="0 0 0" />
+      <mass
+        value="5.478" />
+      <inertia
+        ixx="0.055588"
+        ixy="-2.4545E-10"
+        ixz="-2.6727E-07"
+        iyy="0.031749"
+        iyz="-8.9945E-11"
+        izz="0.040066" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/CHEST1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/CHEST1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="CHEST1"
+    type="continuous">
+    <origin
+      xyz="0 0.036 0"
+      rpy="1.5708 0 -3.1416" />
+    <parent
+      link="base_link" />
+    <child
+      link="CHEST1" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="ARM0_LEFT">
+    <inertial>
+      <origin
+        xyz="0 0 -0.075074"
+        rpy="0 0 0" />
+      <mass
+        value="3.1665" />
+      <inertia
+        ixx="0.0078697"
+        ixy="3.35E-22"
+        ixz="3.5507E-20"
+        iyy="0.0078817"
+        iyz="-6.3811E-20"
+        izz="0.0039641" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM0_LEFT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.86667 0.86667 0.8902 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM0_LEFT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM0_LEFT"
+    type="prismatic">
+    <origin
+      xyz="0 0.52 -0.24407"
+      rpy="-3.1416 0 -3.1416" />
+    <parent
+      link="CHEST1" />
+    <child
+      link="ARM0_LEFT" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.04"
+      upper="0.04"
+      effort="100"
+      velocity="1.0" />
+  </joint>
+  <link
+    name="ARM1_LEFT">
+    <inertial>
+      <origin
+        xyz="3.13795806561323E-08 -0.159382654301942 -0.0275273732634418"
+        rpy="0 0 0" />
+      <mass
+        value="2.36943925387609" />
+      <inertia
+        ixx="0.0333119217877632"
+        ixy="3.89392337350772E-09"
+        ixz="1.90284161936625E-09"
+        iyy="0.00273027282709335"
+        iyz="-0.000396997064015467"
+        izz="0.0346744071353861" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM1_LEFT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM1_LEFT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM1_LEFT"
+    type="continuous">
+    <origin
+      xyz="0 0 0.048"
+      rpy="0 0 0" />
+    <parent
+      link="ARM0_LEFT" />
+    <child
+      link="ARM1_LEFT" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="ARM2_LEFT">
+    <inertial>
+      <origin
+        xyz="-0.147933829267414 -8.17479933745702E-09 0.043707396358746"
+        rpy="0 0 0" />
+      <mass
+        value="1.62272731176337" />
+      <inertia
+        ixx="0.00206068413912523"
+        ixy="1.56632108947467E-09"
+        ixz="0.000173877303537274"
+        iyy="0.0098695709635989"
+        iyz="-1.58760292202307E-08"
+        izz="0.00918604504093384" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM2_LEFT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM2_LEFT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM2_LEFT"
+    type="continuous">
+    <origin
+      xyz="0 -0.38 -0.0725"
+      rpy="0 0 0" />
+    <parent
+      link="ARM1_LEFT" />
+    <child
+      link="ARM2_LEFT" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="ARM3_LEFT">
+    <inertial>
+      <origin
+        xyz="-0.039612082844795 0 0.022051378066143"
+        rpy="0 0 0" />
+      <mass
+        value="0.0480757069986486" />
+      <inertia
+        ixx="3.20083082511178E-05"
+        ixy="1.01050334367889E-20"
+        ixz="3.31997570547699E-06"
+        iyy="5.20078293179275E-05"
+        iyz="-3.94091059438496E-20"
+        izz="4.04524618464536E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM3_LEFT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM3_LEFT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM3_LEFT"
+    type="continuous">
+    <origin
+      xyz="-0.3 0 0.0205"
+      rpy="0 0 0" />
+    <parent
+      link="ARM2_LEFT" />
+    <child
+      link="ARM3_LEFT" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="ARM0_RIGHT">
+    <inertial>
+      <origin
+        xyz="0 0 0.085509"
+        rpy="0 0 0" />
+      <mass
+        value="3.1665" />
+      <inertia
+        ixx="0.0078697"
+        ixy="3.2233E-22"
+        ixz="3.576E-20"
+        iyy="0.0078817"
+        iyz="-6.4444E-20"
+        izz="0.0039641" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM0_RIGHT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.86667 0.86667 0.8902 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM0_RIGHT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM0_RIGHT"
+    type="prismatic">
+    <origin
+      xyz="0 0.52 0.18251"
+      rpy="-3.1416 0 -3.1416" />
+    <parent
+      link="CHEST1" />
+    <child
+      link="ARM0_RIGHT" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-0.04"
+      upper="0.04"
+      effort="100"
+      velocity="1.0" />
+  </joint>
+  <link
+    name="ARM1_RIGHT">
+    <inertial>
+      <origin
+        xyz="-3.13795807116435E-08 -0.159382654301942 0.0379622699810894"
+        rpy="0 0 0" />
+      <mass
+        value="2.36943925387609" />
+      <inertia
+        ixx="0.0333119217877632"
+        ixy="-3.89392337432221E-09"
+        ixz="1.90284162118494E-09"
+        iyy="0.00273027282709335"
+        iyz="0.000396997064015477"
+        izz="0.0346744071353861" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM1_RIGHT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM1_RIGHT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM1_RIGHT"
+    type="continuous">
+    <origin
+      xyz="0 0 -0.048"
+      rpy="0 0 0" />
+    <parent
+      link="ARM0_RIGHT" />
+    <child
+      link="ARM1_RIGHT" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="ARM2_RIGHT">
+    <inertial>
+      <origin
+        xyz="-0.147933829267414 8.17479955950162E-09 -0.0332724996410979"
+        rpy="0 0 0" />
+      <mass
+        value="1.62272731176336" />
+      <inertia
+        ixx="0.00206068413912523"
+        ixy="-1.56632108642184E-09"
+        ixz="-0.000173877303537249"
+        iyy="0.00986957096359889"
+        iyz="-1.58760292180962E-08"
+        izz="0.00918604504093384" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM2_RIGHT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM2_RIGHT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM2_RIGHT"
+    type="continuous">
+    <origin
+      xyz="0 -0.38 0.0725"
+      rpy="0 0 0" />
+    <parent
+      link="ARM1_RIGHT" />
+    <child
+      link="ARM2_RIGHT" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="ARM3_RIGHT">
+    <inertial>
+      <origin
+        xyz="-0.039612082844795 0 -0.0116164813484952"
+        rpy="0 0 0" />
+      <mass
+        value="0.0480757069986486" />
+      <inertia
+        ixx="3.20083082511178E-05"
+        ixy="6.64161991174345E-21"
+        ixz="-3.31997570547702E-06"
+        iyy="5.20078293179274E-05"
+        iyz="1.20888557422305E-20"
+        izz="4.04524618464535E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM3_RIGHT.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ia_robot_urdf/meshes/ARM3_RIGHT.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ARM3_RIGHT"
+    type="continuous">
+    <origin
+      xyz="-0.3 0 -0.0205"
+      rpy="0 0 0" />
+    <parent
+      link="ARM2_RIGHT" />
+    <child
+      link="ARM3_RIGHT" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+
+  <ros2_control name="GsSimSystem" type="system">
+    <hardware>
+        <plugin>topic_based_ros2_control/TopicBasedSystem</plugin>
+        <param name="joint_commands_topic">/joint_commands</param>
+        <param name="joint_states_topic">/joint_states</param>
+        <param name="trigger_joint_command_threshold">-1</param>
+    </hardware>
+    <joint name="Leg_front_left_2">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="Leg_front_right_2">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="Leg_back_left_2">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="Leg_back_right_2">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="Leg_front_left_1">
+        <command_interface name="velocity">
+          <param name="min">-10</param>
+          <param name="max">10</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="Leg_front_right_1">
+        <command_interface name="velocity">
+          <param name="min">-10</param>
+          <param name="max">10</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="Leg_back_left_1">
+        <command_interface name="velocity">
+          <param name="min">-10</param>
+          <param name="max">10</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="Leg_back_right_1">
+        <command_interface name="velocity">
+          <param name="min">-10</param>
+          <param name="max">10</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <!-- Upper Body -->
+      <joint name="ARM0_LEFT">
+        <command_interface name="position">
+          <param name="min">0.0</param>
+          <param name="max">0.04</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="ARM0_RIGHT">
+        <command_interface name="position">
+          <param name="min">0.0</param>
+          <param name="max">0.04</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="ARM1_LEFT">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="ARM1_RIGHT">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="ARM2_LEFT">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="ARM2_RIGHT">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="ARM3_LEFT">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="ARM3_RIGHT">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="CHEST1">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <!-- Chassis movement joints -->
+      <joint name="chassis_x_joint">
+        <command_interface name="position">
+          <param name="min">-2.0</param>
+          <param name="max">2.0</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="chassis_y_joint">
+        <command_interface name="position">
+          <param name="min">-2.0</param>
+          <param name="max">2.0</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="chassis_rotation_joint">
+        <command_interface name="position">
+          <param name="min">-360</param>
+          <param name="max">360</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+  </ros2_control>
+</robot>

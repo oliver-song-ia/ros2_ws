@@ -1,0 +1,10 @@
+# Request: Empty (no parameters needed)
+---
+# Result
+bool success
+string message
+---
+# Feedback
+int32 current_frame
+int32 total_frames
+float32 progress_percentage

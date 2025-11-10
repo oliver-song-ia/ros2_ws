@@ -1,0 +1,6 @@
+# Request
+bool lock  # true = lock joints, false = unlock joints
+---
+# Response
+bool success
+string message

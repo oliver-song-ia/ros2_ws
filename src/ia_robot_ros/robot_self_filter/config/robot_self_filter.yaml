@@ -1,0 +1,55 @@
+# Common configuration for all self_filter nodes
+# Use wildcard matching or specific node names to apply these settings
+"/**":
+  ros__parameters:
+    sensor_frame: "none" # Set to "none" to disable instersection check (containment only)
+    min_sensor_dist: 0.05
+    lidar_sensor_type: 0
+    default_sphere_padding: 0.02  # actually works for all shapes
+    default_sphere_scale: 1.0
+
+    # Downsampling parameters for faster processing
+    enable_downsampling: false
+
+    # Voxel grid method (recommended for most cases)
+    # - Creates uniform 3D grid and keeps one point per voxel
+    # - Preserves spatial distribution while reducing density
+    downsample_method: "voxel"  # Options: "voxel" or "random"
+    voxel_leaf_size: 0.03      # 3cm voxel size (smaller = more points, larger = fewer points)
+    
+    # Random sampling method (alternative)
+    # - Randomly selects points up to max_points limit
+    # - Faster but may lose spatial distribution
+    # downsample_method: "random"
+    max_points: 50000          # Maximum points after random downsampling
+    # NOTE: only working in random mode
+    
+    # Performance tuning guidelines:
+    # - For dense LiDAR (>100k points): voxel_leaf_size: 0.03-0.08
+    # - For sparse LiDAR (<50k points): voxel_leaf_size: 0.02-0.05  
+    # - For real-time processing: max_points: 30000-70000
+    # - For high accuracy: max_points: 80000-150000
+    
+    self_see_links:
+      names:
+        - base_link
+        - CHEST1
+        - ARM1_LEFT
+        - ARM1_RIGHT
+        - ARM2_LEFT
+        - ARM2_RIGHT
+        - ARM3_LEFT
+        - ARM3_RIGHT
+        - Leg_front_left_1
+        - Leg_front_left_2
+        - Leg_front_left_3
+        - Leg_front_right_1
+        - Leg_front_right_2
+        - Leg_front_right_3
+        - Leg_back_left_1
+        - Leg_back_left_2
+        - Leg_back_right_1
+        - Leg_back_right_2
+      
+      # base_link:
+      #   padding: 0.05

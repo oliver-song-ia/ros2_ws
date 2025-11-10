@@ -1,0 +1,9 @@
+# Mission Behavior Tree Configuration - Simplified
+
+mission_bt_node:
+  ros__parameters:
+    # Manipulation timeout in seconds
+    manipulation_timeout: 60.0
+    
+    # Behavior tree tick rate (Hz)
+    tick_rate: 10.0

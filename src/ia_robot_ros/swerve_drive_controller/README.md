@@ -1,0 +1,1 @@
+At the moment, the swerve_drive_controller is not yet merged into the main branch of the ros2_controllers repository. This controller is adapted from the [swerve_drive_controller](https://github.com/ros-controls/ros2_controllers/pull/1694) pull request on commit d4b5d8e8ad958546cee7d5504159840f3109ae6a.
