@@ -148,7 +148,8 @@ OdometryState SwerveDriveKinematics::update_odometry(
   }
   
   // 计算机器人的角速度（rad/s）
-  double wz_robot = wz_sum / wz_denominator;
+  // TODO: 找出为什么角度差一倍
+  double wz_robot = -2.0 * wz_sum / wz_denominator;
 
   // 步骤4: 将机器人本体系的速度转换到世界坐标系
   // 使用旋转矩阵进行坐标变换

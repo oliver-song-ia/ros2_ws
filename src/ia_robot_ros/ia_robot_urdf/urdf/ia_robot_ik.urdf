@@ -80,7 +80,7 @@
     <child
       link="base_link" />
   </joint>
-  
+
   <link
     name="base_link">
     <inertial>

@@ -13,9 +13,15 @@ from launch.conditions import IfCondition
 def generate_launch_description():
     bringup_dir = get_package_share_directory('turn_on_wheeltec_robot')
     ia_robot_dir = get_package_share_directory('ia_robot')
+    ia_robot_urdf_dir = get_package_share_directory('ia_robot_urdf')
     use_sim_time = LaunchConfiguration('use_sim_time', default='False')
     swerve_ctrl_launch_dir = os.path.join(ia_robot_dir, 'launch')
     launch_dir = os.path.join(bringup_dir, 'launch')
+
+    # Robot URDF file path
+    # Use ia_robot.urdf for real robot (no virtual IK joints that conflict with odom)
+    # ia_robot_ik.urdf is only for MoveIt simulation with mobile manipulation
+    urdf_file = os.path.join(ia_robot_urdf_dir, 'urdf', 'ia_robot.urdf')
     wheeltec_robot = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'turn_on_wheeltec_robot.launch.py')),
     )
@@ -69,6 +75,18 @@ def generate_launch_description():
         ]
     )
 
+    # Robot State Publisher - publishes the robot model from URDF
+    robot_state_publisher_node = launch_ros.actions.Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'robot_description': open(urdf_file).read(),
+            'use_sim_time': use_sim_time
+        }]
+    )
+
     rviz_node = launch_ros.actions.Node(
         package='rviz2',
         executable='rviz2',
@@ -83,6 +101,7 @@ def generate_launch_description():
         lidar_ros,
         ahrs_launch,
         swerve_ctrl,
+        robot_state_publisher_node,  # Publish robot model from URDF
         # safety_system_launch, # TODO: modify nav2 output topic to make safety system working
         # twist_mux_node,
         # rviz_node

@@ -68,8 +68,8 @@ swerve_drive_controller:
   }
   wheel_x_offset: {
     type: double,
-    default_value: 0.1,
-    description: ".",
+    default_value: 0.5,
+    description: "Distance from robot center to front/rear wheels (half of wheelbase). Wheelbase = 1.0m",
     validation: {
       "swerve_drive_controller::gt<>": [0.0]
     },
@@ -77,8 +77,8 @@ swerve_drive_controller:
   }
   wheel_y_offset: {
     type: double,
-    default_value: 0.1,
-    description: ".",
+    default_value: 0.275,
+    description: "Distance from robot center to left/right wheels (half of track width). Track width = 0.55m",
     validation: {
       "swerve_drive_controller::gt<>": [0.0]
     },

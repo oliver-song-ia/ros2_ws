@@ -466,8 +466,8 @@ controller_interface::return_type SwerveController::update(
     {
       double _velocity_scale;
 
-      // Get current actual steering angle and convert to our coordinate system
-      double current_steering_angle = -axle_handles_[i]->get_feedback();  // Negate to match our coordinate system
+      // Get current actual steering angle (use hardware coordinate system)
+      double current_steering_angle = axle_handles_[i]->get_feedback();
       double target_steering_angle = wheel_command[i].steering_angle;
       
       // Calculate steering angle error (shortest angular distance)
@@ -539,7 +539,9 @@ controller_interface::return_type SwerveController::update(
     }
     else
     {
-      velocity_array[i] = wheel_handles_[i]->get_feedback();
+      // Apply calibration factor to match real-world odometry
+      constexpr double K = 0.6634;
+      velocity_array[i] = wheel_handles_[i]->get_feedback() * K;
       steering_angle_array[i] = axle_handles_[i]->get_feedback();
     }
   }

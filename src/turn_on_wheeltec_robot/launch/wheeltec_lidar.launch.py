@@ -8,42 +8,24 @@ from launch.actions import (DeclareLaunchArgument, GroupAction,
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
+    # LiDAR driver configuration
     Lslidar_dir = get_package_share_directory('lslidar_driver')
     Lslidar_launch_dir = os.path.join(Lslidar_dir, 'launch')
 
-       
-    Ld14_dir = get_package_share_directory('ldlidar_sl_ros2')
-#     Ld14_launch_dir = os.path.join(Ld14_dir, 'launch')
-    
-#     Ld06_dir = get_package_share_directory('ldlidar_stl_ros2')
-#     Ld06_launch_dir = os.path.join(Ld14_dir, 'launch')
-    
+    # Pointcloud to laserscan converter configuration
     pointcloud_to_laserscan_dir = get_package_share_directory('pointcloud_to_laserscan')
     pointcloud_to_laserscan_launch_dir = os.path.join(pointcloud_to_laserscan_dir, 'launch')
-           
+
+    # LSlidar C16 driver launch
     LSC16 = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(os.path.join(Lslidar_launch_dir, 'lslidar_c16_launch.py')),)
-#     LSC32 = IncludeLaunchDescription(
-#             PythonLaunchDescriptionSource(os.path.join(Lslidar_launch_dir, 'lslidar_c32_launch.py')),)
-    
+            PythonLaunchDescriptionSource(os.path.join(Lslidar_launch_dir, 'lslidar_cx_launch.py')),)
+
+    # Convert 3D point cloud to 2D laser scan
     point_to_scan = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(pointcloud_to_laserscan_launch_dir, 'pointcloud_to_laserscan_launch.py')),)
-                       
-#     Ld14 = IncludeLaunchDescription(
-#             PythonLaunchDescriptionSource(os.path.join(Ld14_launch_dir, 'ld14.launch.py')),)
-#     Ld06 = IncludeLaunchDescription(
-#             PythonLaunchDescriptionSource(os.path.join(Ld06_launch_dir, 'ld06.launch.py')),)
-                  
+
     # Create the launch description and populate
     ld = LaunchDescription()
-    '''
-    Please select your lidar here, options include:
-    LSC16,LSC32,ld14、Ld06.
-    1.If you are using LS* lidar (including lsn10, lsm10*), please don't forget to 
-    modify the tf conversion parameters of robot_mode_description.launch.py
-    according to the user guide file.
-    2.If you are using m10 lidar, please pay attention to distinguish whether it is m10p or not.
-    '''
     ld.add_action(LSC16)
     ld.add_action(point_to_scan)
     return ld

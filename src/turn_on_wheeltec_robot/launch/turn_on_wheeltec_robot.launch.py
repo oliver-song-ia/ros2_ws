@@ -74,7 +74,7 @@ def generate_launch_description():
             package='tf2_ros', 
             executable='static_transform_publisher', 
             name='base_to_laser',
-            arguments=['-0.05', '0', '0','0', '0','0','base_link','laser'],
+            arguments=['0.3', '0', '-0.45','1.571', '0','0','base_link','laser'],
     )      
 
     # 使用slamtool建图时 需要指定odom_combined和map的关系
