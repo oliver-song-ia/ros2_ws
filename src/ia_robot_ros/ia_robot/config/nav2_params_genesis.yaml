@@ -74,7 +74,6 @@ bt_navigator:
     # default_bt_xml_filename: $(ros2 pkg prefix nav2_bt_navigator)/share/nav2_bt_navigator/behavior_trees/navigate_through_poses_w_replanning.xml
     #plugin_lib_names: #行为树节点共享库列表，Humble后的版本默认包含所有NAV2 BT库，这里可以加入自定义BT节点
     plugin_lib_names:
-      - nav2_is_moving_backward_condition_bt_node
       - nav2_behavior_tree
       - nav2_compute_path_to_pose_action_bt_node
       - nav2_compute_path_through_poses_action_bt_node

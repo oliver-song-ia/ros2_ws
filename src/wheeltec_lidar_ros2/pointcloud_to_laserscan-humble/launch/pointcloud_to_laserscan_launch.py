@@ -27,7 +27,7 @@ def generate_launch_description():
         Node(
             package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
             # 话题重映射：输入点云话题(cloud_in)映射到/point_cloud_raw，输出激光扫描话题(scan)映射到/scan
-            remappings=[('cloud_in','/point_cloud_raw'),
+            remappings=[('cloud_in','/cx/point_cloud_raw'),
                         ('scan','/scan')],
             # 点云转激光扫描的核心参数配置
             parameters=[{

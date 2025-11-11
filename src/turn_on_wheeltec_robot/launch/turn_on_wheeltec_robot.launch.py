@@ -133,7 +133,7 @@ def generate_launch_description():
     ld.add_action(base_to_laser)
 #     ld.add_action(map_to_odom_combined)
     # 添加关节状态发布器
-    ld.add_action(joint_state_publisher_node)
+    # ld.add_action(joint_state_publisher_node)
 
     ld.add_action(base_to_imu)
     # 添加IMU滤波节点

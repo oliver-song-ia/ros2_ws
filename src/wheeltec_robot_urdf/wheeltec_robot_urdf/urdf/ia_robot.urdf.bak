@@ -45,7 +45,7 @@
     </collision>
   </link>
   <link
-    name="Leg_front_left-3">
+    name="Leg-front-left-3">
     <inertial>
       <origin
         xyz="-0.106921179827909 1.34423681352747E-07 0.0312269266405216"
@@ -66,7 +66,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_left-3.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-left-3.STL" />
       </geometry>
       <material
         name="">
@@ -80,12 +80,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_left-3.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-left-3.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_front_left-3"
+    name="Leg-front-left-3"
     type="continuous">
     <origin
       xyz="-0.3 -0.265 -0.4179"
@@ -93,12 +93,12 @@
     <parent
       link="base_link" />
     <child
-      link="Leg_front_left-3" />
+      link="Leg-front-left-3" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_front_left-2">
+    name="Leg-front-left-2">
     <inertial>
       <origin
         xyz="-3.98980193327958E-09 -0.0395926660228376 -0.0221412692169536"
@@ -119,7 +119,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_left-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-left-2.STL" />
       </geometry>
       <material
         name="">
@@ -133,25 +133,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_left-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-left-2.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_front_left-2"
+    name="Leg-front-left-2"
     type="continuous">
     <origin
       xyz="-0.2 0 -0.0001"
       rpy="0 0 0" />
     <parent
-      link="Leg_front_left-3" />
+      link="Leg-front-left-3" />
     <child
-      link="Leg_front_left-2" />
+      link="Leg-front-left-2" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_front_left-1">
+    name="Leg-front-left-1">
     <inertial>
       <origin
         xyz="-4.35207425653061E-14 0.00050699503431334 0.000450936567174764"
@@ -172,7 +172,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_left-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-left-1.STL" />
       </geometry>
       <material
         name="">
@@ -186,25 +186,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_left-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-left-1.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_front_left-1"
+    name="Leg-front-left-1"
     type="continuous">
     <origin
       xyz="0 0 -0.102"
       rpy="1.5708 0 0" />
     <parent
-      link="Leg_front_left-2" />
+      link="Leg-front-left-2" />
     <child
-      link="Leg_front_left-1" />
+      link="Leg-front-left-1" />
     <axis
       xyz="0 0 1" />
   </joint>
   <link
-    name="Leg_front_right-3">
+    name="Leg-front-right-3">
     <inertial>
       <origin
         xyz="-0.106921169546996 1.37608200612149E-07 0.0312269186214842"
@@ -225,7 +225,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_right-3.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-right-3.STL" />
       </geometry>
       <material
         name="">
@@ -239,12 +239,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_right-3.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-right-3.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_front_right-3"
+    name="Leg-front-right-3"
     type="continuous">
     <origin
       xyz="-0.3 0.265 -0.4179"
@@ -252,12 +252,12 @@
     <parent
       link="base_link" />
     <child
-      link="Leg_front_right-3" />
+      link="Leg-front-right-3" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_front_right-2">
+    name="Leg-front-right-2">
     <inertial>
       <origin
         xyz="3.98975996684925E-09 0.0395926660232229 -0.0221412692169544"
@@ -278,7 +278,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_right-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-right-2.STL" />
       </geometry>
       <material
         name="">
@@ -292,25 +292,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_right-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-right-2.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_front_right-2"
+    name="Leg-front-right-2"
     type="continuous">
     <origin
       xyz="-0.2 0 -0.0001"
       rpy="0 0 0" />
     <parent
-      link="Leg_front_right-3" />
+      link="Leg-front-right-3" />
     <child
-      link="Leg_front_right-2" />
+      link="Leg-front-right-2" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_front_right-1">
+    name="Leg-front-right-1">
     <inertial>
       <origin
         xyz="1.22124532708767E-15 0.00050699503431284 -0.000450936567562288"
@@ -331,7 +331,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_right-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-right-1.STL" />
       </geometry>
       <material
         name="">
@@ -345,25 +345,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_front_right-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-front-right-1.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_front_right-1"
+    name="Leg-front-right-1"
     type="continuous">
     <origin
       xyz="0 0 -0.102"
       rpy="1.5708 0 0" />
     <parent
-      link="Leg_front_right-2" />
+      link="Leg-front-right-2" />
     <child
-      link="Leg_front_right-1" />
+      link="Leg-front-right-1" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_back_left-2">
+    name="Leg-back-left-2">
     <inertial>
       <origin
         xyz="-3.98975832927029E-09 -0.0395926660232188 -0.0221412692169541"
@@ -384,7 +384,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_left-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-left-2.STL" />
       </geometry>
       <material
         name="">
@@ -398,12 +398,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_left-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-left-2.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_back_left-2"
+    name="Leg-back-left-2"
     type="continuous">
     <origin
       xyz="0.5 -0.265 -0.418"
@@ -411,12 +411,12 @@
     <parent
       link="base_link" />
     <child
-      link="Leg_back_left-2" />
+      link="Leg-back-left-2" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_back_left-1">
+    name="Leg-back-left-1">
     <inertial>
       <origin
         xyz="0 0.000506995034313118 -0.000450936567555904"
@@ -437,7 +437,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_left-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-left-1.STL" />
       </geometry>
       <material
         name="">
@@ -451,25 +451,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_left-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-left-1.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_back_left-1"
+    name="Leg-back-left-1"
     type="continuous">
     <origin
       xyz="0 0 -0.102"
       rpy="1.5708 0 3.1416" />
     <parent
-      link="Leg_back_left-2" />
+      link="Leg-back-left-2" />
     <child
-      link="Leg_back_left-1" />
+      link="Leg-back-left-1" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_back_right-2">
+    name="Leg-back-right-2">
     <inertial>
       <origin
         xyz="3.98975841253701E-09 0.0395926660232188 -0.0221412692169539"
@@ -490,7 +490,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_right-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-right-2.STL" />
       </geometry>
       <material
         name="">
@@ -504,12 +504,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_right-2.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-right-2.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_back_right-2"
+    name="Leg-back-right-2"
     type="continuous">
     <origin
       xyz="0.5 0.265000000000002 -0.418000000000001"
@@ -517,12 +517,12 @@
     <parent
       link="base_link" />
     <child
-      link="Leg_back_right-2" />
+      link="Leg-back-right-2" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="Leg_back_right-1">
+    name="Leg-back-right-1">
     <inertial>
       <origin
         xyz="0 0.000506995034313229 -0.00045093656755596"
@@ -543,7 +543,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_right-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-right-1.STL" />
       </geometry>
       <material
         name="">
@@ -557,20 +557,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg_back_right-1.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/Leg-back-right-1.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Leg_back_right-1"
+    name="Leg-back-right-1"
     type="continuous">
     <origin
       xyz="0 0 -0.102"
       rpy="1.5708 0 0" />
     <parent
-      link="Leg_back_right-2" />
+      link="Leg-back-right-2" />
     <child
-      link="Leg_back_right-1" />
+      link="Leg-back-right-1" />
     <axis
       xyz="0 0 -1" />
   </joint>
@@ -628,7 +628,7 @@
       xyz="0 0 -1" />
   </joint>
   <link
-    name="ARM0_LEFT">
+    name="ARM0-LEFT">
     <inertial>
       <origin
         xyz="0 0 -0.075074"
@@ -649,7 +649,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0-LEFT.STL" />
       </geometry>
       <material
         name="">
@@ -663,12 +663,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0-LEFT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM0_LEFT"
+    name="ARM0-LEFT"
     type="prismatic">
     <origin
       xyz="0 0.52 -0.24407"
@@ -676,7 +676,7 @@
     <parent
       link="CHEST1" />
     <child
-      link="ARM0_LEFT" />
+      link="ARM0-LEFT" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -686,7 +686,7 @@
       velocity="0" />
   </joint>
   <link
-    name="ARM1_LEFT">
+    name="ARM1-LEFT">
     <inertial>
       <origin
         xyz="3.13795806561323E-08 -0.159382654301942 -0.0275273732634418"
@@ -707,7 +707,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1-LEFT.STL" />
       </geometry>
       <material
         name="">
@@ -721,25 +721,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1-LEFT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM1_LEFT"
+    name="ARM1-LEFT"
     type="continuous">
     <origin
       xyz="0 0 0.048"
       rpy="0 0 0" />
     <parent
-      link="ARM0_LEFT" />
+      link="ARM0-LEFT" />
     <child
-      link="ARM1_LEFT" />
+      link="ARM1-LEFT" />
     <axis
       xyz="0 0 1" />
   </joint>
   <link
-    name="ARM2_LEFT">
+    name="ARM2-LEFT">
     <inertial>
       <origin
         xyz="-0.147933829267414 -8.17479933745702E-09 0.043707396358746"
@@ -760,7 +760,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2-LEFT.STL" />
       </geometry>
       <material
         name="">
@@ -774,25 +774,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2-LEFT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM2_LEFT"
+    name="ARM2-LEFT"
     type="continuous">
     <origin
       xyz="0 -0.38 -0.0725"
       rpy="0 0 0" />
     <parent
-      link="ARM1_LEFT" />
+      link="ARM1-LEFT" />
     <child
-      link="ARM2_LEFT" />
+      link="ARM2-LEFT" />
     <axis
       xyz="0 0 1" />
   </joint>
   <link
-    name="ARM3_LEFT">
+    name="ARM3-LEFT">
     <inertial>
       <origin
         xyz="-0.039612082844795 0 0.022051378066143"
@@ -813,7 +813,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3-LEFT.STL" />
       </geometry>
       <material
         name="">
@@ -827,25 +827,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3_LEFT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3-LEFT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM3_LEFT"
+    name="ARM3-LEFT"
     type="continuous">
     <origin
       xyz="-0.3 0 0.0205"
       rpy="0 0 0" />
     <parent
-      link="ARM2_LEFT" />
+      link="ARM2-LEFT" />
     <child
-      link="ARM3_LEFT" />
+      link="ARM3-LEFT" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="ARM0_RIGHT">
+    name="ARM0-RIGHT">
     <inertial>
       <origin
         xyz="0 0 0.085509"
@@ -866,7 +866,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0-RIGHT.STL" />
       </geometry>
       <material
         name="">
@@ -880,12 +880,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM0-RIGHT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM0_RIGHT"
+    name="ARM0-RIGHT"
     type="prismatic">
     <origin
       xyz="0 0.52 0.18251"
@@ -893,7 +893,7 @@
     <parent
       link="CHEST1" />
     <child
-      link="ARM0_RIGHT" />
+      link="ARM0-RIGHT" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -903,7 +903,7 @@
       velocity="0" />
   </joint>
   <link
-    name="ARM1_RIGHT">
+    name="ARM1-RIGHT">
     <inertial>
       <origin
         xyz="-3.13795807116435E-08 -0.159382654301942 0.0379622699810894"
@@ -924,7 +924,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1-RIGHT.STL" />
       </geometry>
       <material
         name="">
@@ -938,25 +938,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM1-RIGHT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM1_RIGHT"
+    name="ARM1-RIGHT"
     type="continuous">
     <origin
       xyz="0 0 -0.048"
       rpy="0 0 0" />
     <parent
-      link="ARM0_RIGHT" />
+      link="ARM0-RIGHT" />
     <child
-      link="ARM1_RIGHT" />
+      link="ARM1-RIGHT" />
     <axis
       xyz="0 0 -1" />
   </joint>
   <link
-    name="ARM2_RIGHT">
+    name="ARM2-RIGHT">
     <inertial>
       <origin
         xyz="-0.147933829267414 8.17479955950162E-09 -0.0332724996410979"
@@ -977,7 +977,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2-RIGHT.STL" />
       </geometry>
       <material
         name="">
@@ -991,25 +991,25 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM2-RIGHT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM2_RIGHT"
+    name="ARM2-RIGHT"
     type="continuous">
     <origin
       xyz="0 -0.38 0.0725"
       rpy="0 0 0" />
     <parent
-      link="ARM1_RIGHT" />
+      link="ARM1-RIGHT" />
     <child
-      link="ARM2_RIGHT" />
+      link="ARM2-RIGHT" />
     <axis
       xyz="0 0 1" />
   </joint>
   <link
-    name="ARM3_RIGHT">
+    name="ARM3-RIGHT">
     <inertial>
       <origin
         xyz="-0.039612082844795 0 -0.0116164813484952"
@@ -1030,7 +1030,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3-RIGHT.STL" />
       </geometry>
       <material
         name="">
@@ -1044,20 +1044,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3_RIGHT.STL" />
+          filename="file:///home/ia/wheel_ros/src/wheeltec_robot_urdf/wheeltec_robot_urdf/meshes/ia_robot/ARM3-RIGHT.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="ARM3_RIGHT"
+    name="ARM3-RIGHT"
     type="continuous">
     <origin
       xyz="-0.3 0 -0.0205"
       rpy="0 0 0" />
     <parent
-      link="ARM2_RIGHT" />
+      link="ARM2-RIGHT" />
     <child
-      link="ARM3_RIGHT" />
+      link="ARM3-RIGHT" />
     <axis
       xyz="0 0 1" />
   </joint>

@@ -21,8 +21,10 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(os.path.join(Lslidar_launch_dir, 'lslidar_cx_launch.py')),)
 
     # Convert 3D point cloud to 2D laser scan
+    # Remap input topic to match lslidar driver output
     point_to_scan = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(os.path.join(pointcloud_to_laserscan_launch_dir, 'pointcloud_to_laserscan_launch.py')),)
+            PythonLaunchDescriptionSource(os.path.join(pointcloud_to_laserscan_launch_dir, 'pointcloud_to_laserscan_launch.py')),
+            launch_arguments={'cloud_in': '/cx/point_cloud_raw'}.items())
 
     # Create the launch description and populate
     ld = LaunchDescription()
