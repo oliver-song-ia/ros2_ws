@@ -33,7 +33,7 @@ def generate_launch_description():
     # Declare the launch arguments
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(get_package_share_directory('ia_slam_toolbox'), 'maps', 'ia_map.yaml'),
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'maps', 'map_1111.yaml'),
         description='Full path to the ROS2 map yaml file to use')
 
     declare_params_file_cmd = DeclareLaunchArgument(
@@ -147,10 +147,36 @@ def generate_launch_description():
 
     # Add the actions to launch all of the navigation nodes
     ld.add_action(bringup_launch)
-    
+
+    # Add AMCL node for localization
+    amcl_node = Node(
+        package='nav2_amcl',
+        executable='amcl',
+        name='amcl',
+        output='screen',
+        parameters=[configured_params],
+        remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]
+    )
+
+    # Lifecycle manager for AMCL
+    amcl_lifecycle_manager = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager_amcl',
+        output='screen',
+        parameters=[
+            {'use_sim_time': use_sim_time},
+            {'autostart': autostart},
+            {'node_names': ['amcl']}
+        ]
+    )
+
+    ld.add_action(amcl_node)
+    ld.add_action(amcl_lifecycle_manager)
+
     # Add twist_mux (always runs for velocity command management)
     # ld.add_action(twist_mux_node)
-    
+
     # Add safety system (conditional - only emergency stop if enabled)
     # ld.add_action(safety_system_launch)
 

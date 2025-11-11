@@ -75,6 +75,14 @@ PointCloudToLaserScanNode::PointCloudToLaserScanNode(const rclcpp::NodeOptions &
   inf_epsilon_ = this->declare_parameter("inf_epsilon", 1.0);
   use_inf_ = this->declare_parameter("use_inf", true);
 
+  // Robot self-filter parameters (box filter)
+  // Robot size: 1.1m x 0.6m
+  filter_robot_box_ = this->declare_parameter("filter_robot_box", true);
+  robot_box_min_x_ = this->declare_parameter("robot_box_min_x", -0.6);
+  robot_box_max_x_ = this->declare_parameter("robot_box_max_x", 0.6);
+  robot_box_min_y_ = this->declare_parameter("robot_box_min_y", -1);
+  robot_box_max_y_ = this->declare_parameter("robot_box_max_y", 1);
+
   pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan", rclcpp::SensorDataQoS());
 
   using std::placeholders::_1;
@@ -227,6 +235,33 @@ void PointCloudToLaserScanNode::cloudCallback(
       scan_msg->ranges[index] = range;
     }
   }
+
+  // Filter robot body after scan is built (robot size: 1.1m x 0.6m)
+  if (filter_robot_box_) {
+    for (size_t i = 0; i < scan_msg->ranges.size(); ++i) {
+      double angle = scan_msg->angle_min + i * scan_msg->angle_increment;
+      double range = scan_msg->ranges[i];
+
+      if (std::isinf(range) || range > scan_msg->range_max) {
+        continue;
+      }
+
+      // Convert polar to cartesian
+      double x = range * cos(angle);
+      double y = range * sin(angle);
+
+      // Check if point is inside robot box
+      if (x >= robot_box_min_x_ && x <= robot_box_max_x_ &&
+          y >= robot_box_min_y_ && y <= robot_box_max_y_) {
+        if (use_inf_) {
+          scan_msg->ranges[i] = std::numeric_limits<double>::infinity();
+        } else {
+          scan_msg->ranges[i] = scan_msg->range_max + inf_epsilon_;
+        }
+      }
+    }
+  }
+
   pub_->publish(std::move(scan_msg));
 }
 

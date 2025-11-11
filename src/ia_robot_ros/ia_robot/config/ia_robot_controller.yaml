@@ -48,9 +48,9 @@ swerve_drive_controller:
     open_loop: false
 
     velocity_threshold: 50.0 # angular velocity of the wheel, in rad/s. 50 is about 4.25 m/s for .085m radius
-    steering_angle_tolerance: 1.5 # rad. 增大容忍度，允许舵角响应时间
+    steering_angle_tolerance: 0.5 # rad. 增大容忍度，允许舵角响应时间
     # Wheel velocity will be scaled down when error exceeds this threshold to prevent wheel scrubbing.
-    max_steering_error_for_zero_velocity: 3.0 # rad. 增大限制，避免转向时轮速被过早压制
+    max_steering_error_for_zero_velocity: 1.0 # rad. 增大限制，避免转向时轮速被过早压制
     # Velocity scales linearly between steering_angle_tolerance and this value.
 
     pose_covariance_diagonal : [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]

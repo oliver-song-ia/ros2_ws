@@ -1255,22 +1255,22 @@ void turn_on_robot::Robot_Data_Deal(char* data,int len){
       switch(data[6]){
         case 2:                                                 //前左一
           robot_joint_status.velocity[0] = 0.0;
-          robot_joint_status.position[0] = (float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.position[0] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x01;
           break;
         case 3:
           robot_joint_status.velocity[1] = 0.0;
-          robot_joint_status.position[1] = (float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.position[1] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x02;
           break;
         case 4:
           robot_joint_status.velocity[2] = 0.0;
-          robot_joint_status.position[2] = (float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.position[2] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x04;
           break;
         case 5:
           robot_joint_status.velocity[3] = 0.0;
-          robot_joint_status.position[3] = (float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.position[3] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x08;
           break;
         case 6:

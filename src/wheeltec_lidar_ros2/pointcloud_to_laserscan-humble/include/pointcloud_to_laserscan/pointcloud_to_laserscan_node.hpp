@@ -95,6 +95,10 @@ private:
     range_max_;
   bool use_inf_;
   double inf_epsilon_;
+
+  // Robot self-filter parameters
+  bool filter_robot_box_;
+  double robot_box_min_x_, robot_box_max_x_, robot_box_min_y_, robot_box_max_y_;
 };
 
 }  // namespace pointcloud_to_laserscan
