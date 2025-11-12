@@ -102,8 +102,8 @@ def generate_launch_description():
         ahrs_launch,
         swerve_ctrl,
         robot_state_publisher_node,  # Publish robot model from URDF
-        # safety_system_launch, # TODO: modify nav2 output topic to make safety system working
-        # twist_mux_node,
+        safety_system_launch,
+        twist_mux_node,
         # rviz_node
         ]
     )

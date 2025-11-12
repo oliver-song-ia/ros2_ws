@@ -20,3 +20,10 @@ ros2 topic echo /swerve_drive_controller/odom --field pose.pose
 conda activate human-pose
 python visualize_odom.py
 ```
+
+
+
+## nav2 改动
+1. `/ia_slam_toolbox/launch/navigation_launch.py`:
+   - Modified the remapping of `cmd_vel` and `cmd_vel_smoothed` topics to integrate with the ultrasonic safety system.
+   - The `cmd_vel` from Nav2 is now remapped to `cmd_vel_controller`, and the smoothed velocity commands are published to `cmd_vel_nav`.
