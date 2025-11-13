@@ -85,7 +85,10 @@ def generate_launch_description():
             'params_file': configured_params,
             'autostart': autostart,
             'slam': slam,
-        }.items()
+        }.items(),
+        # remap the cmd_vel topic to /cmd_vel_nav
+        # remappings=[('cmd_vel', '/cmd_vel_nav')]  # 添加话题重映射
+
     )
 
     # Create the launch description and populate

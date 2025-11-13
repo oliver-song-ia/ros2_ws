@@ -2,6 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseArray, Pose, Point, Quaternion
+from visualization_msgs.msg import Marker, MarkerArray
 import pandas as pd
 import numpy as np
 import os
@@ -11,8 +12,9 @@ class MocapUnifiedPublisher(Node):
     def __init__(self, csv_file=None, frame_rate=10.0):
         super().__init__('mocap_unified_publisher')
 
-        # Create publisher for demo_target_poses
+        # Create publishers
         self.arm_publisher = self.create_publisher(PoseArray, '/demo_target_poses', 10)
+        self.skeleton_marker_publisher = self.create_publisher(MarkerArray, '/skeleton_markers', 10)
 
         # Default to the inference_trajectory_gt.csv file
         if csv_file is None:
@@ -33,12 +35,35 @@ class MocapUnifiedPublisher(Node):
 
         self.get_logger().info(f'Loaded {len(self.traj_data)} frames for trajectory {first_traj_id}')
 
-        # Calculate publish interval based on frame rate
-        self.publish_interval = 1.0 / frame_rate
+        # Calculate publish interval based on frame rate (1/5 speed = 5x slower = 5x interval)
+        self.publish_interval = 5.0 / frame_rate
+
+        # Position offsets
+        self.x_offset = -0.8  # X-axis offset (1.5m to the left, negative x direction)
+        self.y_offset = 1.5   # Y-axis offset (1.5m in positive y direction)
 
         # Reset frame index for easy iteration
         self.traj_data.reset_index(drop=True, inplace=True)
         self.current_frame = 0
+
+        # Define skeleton joint names
+        self.joint_names = [
+            'Head', 'Neck', 'R_Shoulder', 'L_Shoulder',
+            'R_Elbow', 'L_Elbow', 'R_Hand', 'L_Hand', 'Torso',
+            'R_Hip', 'L_Hip', 'R_Knee', 'L_Knee', 'R_Foot', 'L_Foot'
+        ]
+
+        # Define skeleton connections
+        self.connections = [
+            ('Torso', 'Neck'), ('Neck', 'Head'),
+            ('Neck', 'R_Shoulder'), ('Neck', 'L_Shoulder'),
+            ('R_Shoulder', 'R_Elbow'), ('R_Elbow', 'R_Hand'),
+            ('L_Shoulder', 'L_Elbow'), ('L_Elbow', 'L_Hand'),
+            ('Torso', 'R_Hip'), ('Torso', 'L_Hip'),
+            ('R_Hip', 'R_Knee'), ('R_Knee', 'R_Foot'),
+            ('L_Hip', 'L_Knee'), ('L_Knee', 'L_Foot'),
+            ('R_Hip', 'L_Hip')
+        ]
 
         # Create timer for publishing
         self.timer = self.create_timer(self.publish_interval, self.publish_data)
@@ -50,7 +75,17 @@ class MocapUnifiedPublisher(Node):
             self.get_logger().info('Looping trajectory data')
 
         row = self.traj_data.iloc[self.current_frame]
+        timestamp = self.get_clock().now().to_msg()
 
+        # Publish arm poses
+        self.publish_arm_poses(row, timestamp)
+
+        # Publish skeleton markers
+        self.publish_skeleton(row, timestamp)
+
+        self.current_frame += 1
+
+    def publish_arm_poses(self, row, timestamp):
         # Get raw positions from CSV (convert mm to m)
         left1_pos = np.array([row['Left_L1_x']/1000.0, row['Left_L1_y']/1000.0, row['Left_L1_z']/1000.0])
         left2_pos = np.array([row['Left_L2_x']/1000.0, row['Left_L2_y']/1000.0, row['Left_L2_z']/1000.0])
@@ -62,6 +97,16 @@ class MocapUnifiedPublisher(Node):
         left2_pos = self.rotate_x_minus_90(left2_pos)
         right1_pos = self.rotate_x_minus_90(right1_pos)
         right2_pos = self.rotate_x_minus_90(right2_pos)
+
+        # Apply position offsets
+        left1_pos[0] += self.x_offset
+        left1_pos[1] += self.y_offset
+        left2_pos[0] += self.x_offset
+        left2_pos[1] += self.y_offset
+        right1_pos[0] += self.x_offset
+        right1_pos[1] += self.y_offset
+        right2_pos[0] += self.x_offset
+        right2_pos[1] += self.y_offset
 
         # Calculate arm centers
         left_center = (left1_pos + left2_pos) / 2.0
@@ -86,13 +131,82 @@ class MocapUnifiedPublisher(Node):
 
         # Create and publish PoseArray
         pose_array = PoseArray()
-        pose_array.header.stamp = self.get_clock().now().to_msg()
+        pose_array.header.stamp = timestamp
         pose_array.header.frame_id = "map"
         pose_array.poses = [left_arm_pose, right_arm_pose]
 
         self.arm_publisher.publish(pose_array)
 
-        self.current_frame += 1
+    def publish_skeleton(self, row, timestamp):
+        # Extract joint positions
+        joint_poses = {}
+        for joint_name in self.joint_names:
+            pos = np.array([row[f'{joint_name}_gt_x'] / 1000.0,
+                           row[f'{joint_name}_gt_y'] / 1000.0,
+                           row[f'{joint_name}_gt_z'] / 1000.0])
+            pos = self.rotate_x_minus_90(pos)
+            # Apply position offsets
+            pos[0] += self.x_offset
+            pos[1] += self.y_offset
+            joint_poses[joint_name] = pos
+
+        # Create marker array
+        marker_array = MarkerArray()
+
+        # Create sphere markers for joints
+        for i, (joint_name, pos) in enumerate(joint_poses.items()):
+            marker = Marker()
+            marker.header.frame_id = "map"
+            marker.header.stamp = timestamp
+            marker.ns = "skeleton_joints"
+            marker.id = i
+            marker.type = Marker.SPHERE
+            marker.action = Marker.ADD
+            marker.pose.position = Point(x=float(pos[0]), y=float(pos[1]), z=float(pos[2]))
+            marker.pose.orientation = Quaternion(x=0.0, y=0.0, z=0.0, w=1.0)
+            marker.scale.x = marker.scale.y = marker.scale.z = 0.05
+
+            # Color based on body part
+            if 'Head' in joint_name or 'Neck' in joint_name:
+                marker.color.r, marker.color.g, marker.color.b = 1.0, 1.0, 0.0
+            elif 'L' in joint_name:
+                marker.color.r, marker.color.g, marker.color.b = 1.0, 0.0, 0.0
+            elif 'R' in joint_name:
+                marker.color.r, marker.color.g, marker.color.b = 0.0, 0.0, 1.0
+            else:
+                marker.color.r, marker.color.g, marker.color.b = 0.0, 1.0, 0.0
+            marker.color.a = 1.0
+            marker_array.markers.append(marker)
+
+        # Create line markers for connections
+        for i, (parent, child) in enumerate(self.connections):
+            if parent in joint_poses and child in joint_poses:
+                line = Marker()
+                line.header.frame_id = "map"
+                line.header.stamp = timestamp
+                line.ns = "skeleton_bones"
+                line.id = i
+                line.type = Marker.LINE_STRIP
+                line.action = Marker.ADD
+                parent_pos = joint_poses[parent]
+                child_pos = joint_poses[child]
+                line.points = [
+                    Point(x=float(parent_pos[0]), y=float(parent_pos[1]), z=float(parent_pos[2])),
+                    Point(x=float(child_pos[0]), y=float(child_pos[1]), z=float(child_pos[2]))
+                ]
+                line.scale.x = 0.02
+
+                # Color based on body part
+                if 'L' in parent or 'L' in child:
+                    line.color.r, line.color.g, line.color.b = 1.0, 0.0, 0.0
+                elif 'R' in parent or 'R' in child:
+                    line.color.r, line.color.g, line.color.b = 0.0, 0.0, 1.0
+                else:
+                    line.color.r, line.color.g, line.color.b = 0.0, 1.0, 0.0
+                line.color.a = 0.8
+                marker_array.markers.append(line)
+
+        self.skeleton_marker_publisher.publish(marker_array)
 
     def rotate_x_minus_90(self, pos):
         """Rotate point around X-axis by -90 degrees: (x, y, z) -> (x, -z, y)"""
@@ -136,7 +250,10 @@ def main(args=None):
     if publisher.traj_data.empty:
         return
 
-    print("Publishing demo_target_poses from inference_trajectory_gt.csv (first trajectory)")
+    print("Publishing from inference_trajectory_gt.csv (first trajectory)")
+    print("Topics:")
+    print("  - /demo_target_poses: Arm poses")
+    print("  - /skeleton_markers: Skeleton visualization")
     print("Press Ctrl+C to stop...")
 
     try:

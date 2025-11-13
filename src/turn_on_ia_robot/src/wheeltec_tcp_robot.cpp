@@ -507,7 +507,7 @@ void turn_on_robot::Cmd_Vel_Callback_Status(const sensor_msgs::msg::JointState::
 
 //新版本指令接收处理
 void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg::JointState::SharedPtr staus){
-  RCLCPP_INFO(this->get_logger(),"Ia_Joint_Commands_Callback_Status_New");
+  // RCLCPP_INFO(this->get_logger(),"Ia_Joint_Commands_Callback_Status_New");
   uint16_t crc; 
   cmd_structure_t send_data;
   uint16_t speed_data;
@@ -551,7 +551,7 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg
   send_data.cmd_command[1] = 0x00;
   send_data.cmd_len[0] = 0x00;
   send_data.cmd_len[1] = MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN+8; //发送长度
-
+    /*
     //2- Leg_front_left_2    前左二（舵轮）
     //3- Leg_front_right_2   前右二（舵轮）
     //4- Leg_back_left_2     后左二（舵轮）
@@ -567,6 +567,24 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg
     // 15- ARM2_RIGHT        腕右
     // 16- ARM3_LEFT         肩部485
     // 17- ARM3_RIGHT
+    */
+   //改为下
+   //2- Leg_front_left_2    前左二（舵轮） 0
+    //3- Leg_front_right_2   前右二（舵轮）1
+    //4- Leg_back_left_2     后左二（舵轮）2
+    //5- Leg_back_right_2    后右二（舵轮) 3
+    //6- Leg_front_left_3    前左三（舵轮）4
+    //7- Leg_front_right_3   前右三（舵轮）5
+    //8.9- CHEST1            胸           6
+    // 10- ARM0_LEFT         肩部485左    7  
+    // 11- ARM0_RIGHT        肩部485右    8
+
+    // 12- ARM1_LEFT         肩部左       9
+    // 13- ARM1_RIGHT        肩部右       10
+    // 14- ARM2_LEFT         肘部左       11
+    // 15- ARM2_RIGHT        肘部右       12
+    // 16- ARM3_LEFT         腕左         13
+    // 17- ARM3_RIGHT        腕右         14
   float positon_step;
   int32_t position;
 
@@ -600,6 +618,7 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+3] = (uint8_t)((position>>8)&0xff);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+4] = (uint8_t)((position>>16)&0xff);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+5] = (uint8_t)((position>>24)&0xff);
+      
         position = -(position);   //TODO 检查是否适配
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+6] = (i+3);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+7] = 0x1e;
@@ -608,7 +627,9 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+10] = (uint8_t)((position>>16)&0xff);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+11] = (uint8_t)((position>>24)&0xff);
       }else{
-        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+6] = (i+2);
+        positon_step = (staus->position[i+2])/PI/2;  //弧度计算
+        position = static_cast<int>(Pos_init_data[i+2]-positon_step*STM_ONE_CYCLE);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+6] = (i+3);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+7] = 0x1e;
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+8] = (uint8_t)(position&0xff);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+9] = (uint8_t)((position>>8)&0xff);
@@ -637,8 +658,8 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg
   send_data.cmd_len[0] = 0x00;
   send_data.cmd_len[1] = 10; //发送长度
 
-  send_data.cmd_data[0] = (uint8_t)(((int)staus->position[13])>>8)&0xff;
-  send_data.cmd_data[1] = (uint8_t)((int)staus->position[13])&0xff;
+  send_data.cmd_data[0] = (uint8_t)(((int)staus->position[8])>>8)&0xff;
+  send_data.cmd_data[1] = (uint8_t)((int)staus->position[8])&0xff;
   #ifdef IA_USE_TCP
     stm_all.tcp_truct_t.tcp_write((char*)&send_data,10); //发送tcp
   #else
@@ -1222,38 +1243,42 @@ void turn_on_robot::Robot_Data_Deal(char* data,int len){
           joint_publish_flag |=0x80;
           break;
         case 10:
-          robot_joint_status.velocity[7] = 0.0;
-          robot_joint_status.position[7] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.velocity[9] = 0.0;
+          robot_joint_status.position[9] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x100;
           break;
         case 11:
-          robot_joint_status.velocity[8] = 0.0;
-          robot_joint_status.position[8] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.velocity[10] = 0.0;
+          robot_joint_status.position[10] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x200;
           break; 
         case 12:
-          robot_joint_status.velocity[9] = 0.0;
-          robot_joint_status.position[9] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.velocity[11] = 0.0;
+          robot_joint_status.position[11] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x400;
           break;
         case 13:
-          robot_joint_status.velocity[10] = 0.0;
-          robot_joint_status.position[10] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.velocity[12] = 0.0;
+          robot_joint_status.position[12] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x800;
           break;
         case 14:
-          robot_joint_status.velocity[11] = 0.0;
-          robot_joint_status.position[11] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.velocity[13] = 0.0;
+          robot_joint_status.position[13] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x1000;
           break;
         case 15:
-          robot_joint_status.velocity[12] = 0.0;
-          robot_joint_status.position[12] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.velocity[14] = 0.0;
+          robot_joint_status.position[14] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x2000;
           break;         
       }
+  }else if(data[1]==CMD_TYPE_RS485_MOTOR){    //肩部电机
+    robot_joint_status.velocity[7] = 0.0;
+    robot_joint_status.position[7] = (float)((data[6]<<8)+data[7]);
+    robot_joint_status.velocity[8] = 0.0;
+    robot_joint_status.position[8] = -(float)((data[6]<<8)+data[7]);
   }else{
-    
     if(data[6]==0x11){
       robot_joint_status.velocity[15] = WHEEL_FRONT_LEFT*Odom_Trans(data[9],data[10])*160.0/60.0*STM_PI;
       robot_joint_status.position[15] = 0;
@@ -1291,6 +1316,7 @@ void turn_on_robot::Tcp_Cmd_Data_Deal(char* Receive_Tcp_Data,int num){
         //RCLCPP_INFO(this->get_logger(),"CMD_TYPE_WHEEL_MOTOR");
         Wheel_Data_Deal(Receive_Tcp_Data,num);
         break;*/
+      case CMD_TYPE_RS485_MOTOR:  
       case CMD_TYPE_JOINT_MOTOR: 
       case CMD_TYPE_WHEEL_MOTOR:
         Robot_Data_Deal(Receive_Tcp_Data,num);
@@ -1417,7 +1443,7 @@ Date: 20251103
 心跳 55 00 00 00 00 09 00 00 00 
 ***************************************/
 void turn_on_robot::heart_timer_callback(){
-  RCLCPP_INFO(this->get_logger(),"heart_timer_callback");
+  // RCLCPP_INFO(this->get_logger(),"heart_timer_callback");
   char Heart_Send_Data[9] = {0x55,0x00,0x00,0x00,0x00,0x09,0x00,0x55,0x18}; //小端
   uint16_t crc = com_crc((uint8_t*)Heart_Send_Data,7);
   Heart_Send_Data[7] = (crc>>8)&0xff;

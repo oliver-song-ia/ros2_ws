@@ -13,7 +13,7 @@ def generate_launch_description():
     pkg_share = get_package_share_directory('ia_robot_urdf')
 
     # File paths
-    urdf_file = os.path.join(pkg_share, 'urdf', 'ia_robot_ik.urdf')
+    urdf_file = os.path.join(pkg_share, 'urdf', 'ia_robot_ik.absolute.urdf')
     rviz_config_file = os.path.join(pkg_share, 'config', 'urdf.rviz')
 
     return LaunchDescription([

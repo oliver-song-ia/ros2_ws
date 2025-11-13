@@ -7,10 +7,14 @@ import logging
 import pinocchio as pin
 import os
 import matplotlib.pyplot as plt
+import warnings
 from collision_checker import CollisionChecker
 from mobile_ik_config import MobileIKConfig
 
 from ament_index_python.packages import get_package_share_directory
+
+# Suppress scipy SLSQP bounds clipping warnings (these are normal during optimization)
+warnings.filterwarnings('ignore', message='Values in x were outside bounds during a minimize step')
 
 # Mobile IK solver using URDF-based forward kinematics
 class SimpleMobileIK:
@@ -19,7 +23,7 @@ class SimpleMobileIK:
         
         # Load URDF model using Pinocchio
         urdf_pkg_share = get_package_share_directory('ia_robot_urdf')
-        urdf_path = os.path.join(urdf_pkg_share, 'urdf', 'ia_robot_ik.urdf')
+        urdf_path = os.path.join(urdf_pkg_share, 'urdf', 'ia_robot_ik.absolute.urdf')
         if not os.path.exists(urdf_path):
             raise FileNotFoundError(f"URDF file not found: {urdf_path}")
             
@@ -35,12 +39,12 @@ class SimpleMobileIK:
             # Torso
             'CHEST1': (0, np.pi/2),
             # Left arm
-            'ARM0_LEFT': (-0.05, 0.2),   # prismatic
+            'ARM0_LEFT': (0, 0.04),   # prismatic
             'ARM1_LEFT': (0, np.pi),    # Limited to 0 to π
             'ARM2_LEFT': (-np.pi, 0),   # Limited to -π to 0
             'ARM3_LEFT': (-np.pi, np.pi),
             # Right arm
-            'ARM0_RIGHT': (-0.05, 0.2),  # prismatic
+            'ARM0_RIGHT': (0, 0.04),  # prismatic
             'ARM1_RIGHT': (0, np.pi),   # Limited to 0 to π
             'ARM2_RIGHT': (-np.pi, 0),  # Limited to -π to 0
             'ARM3_RIGHT': (-np.pi, np.pi),

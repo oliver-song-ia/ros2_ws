@@ -6,7 +6,7 @@ from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.action import ActionServer, GoalResponse, CancelResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
-from geometry_msgs.msg import PoseStamped, PoseArray, Twist, Pose, Point, Quaternion, PointStamped
+from geometry_msgs.msg import PoseStamped, PoseArray, Twist, Pose, Point, Quaternion, PointStamped, PoseWithCovarianceStamped
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from sensor_msgs.msg import JointState, PointCloud2
 from nav_msgs.msg import Odometry
@@ -84,8 +84,8 @@ class MobileIKController(Node):
         self.previous_chassis_pose = (0.0, 0.0, 0.0)
         
         # Current pose from odometry
-        self.current_odom_pose = None
-        self.odom_lock = threading.Lock()
+        self.current_pose = None
+        self.pose_lock = threading.Lock()
         
         # Velocity filtering for chassis commands
         self.velocity_history = {
@@ -275,7 +275,36 @@ class MobileIKController(Node):
         self.control_timer = self.create_timer(self.dt, self.control_loop)
         
         self.get_logger().info("Waiting for target poses on /target_poses...")
-    
+
+        # Synchronize current_q with actual robot pose from map frame
+        self.sync_current_q_with_pose()
+
+    def sync_current_q_with_pose(self):
+        """Synchronize current_q chassis position with actual robot pose from map/odom"""
+        self.get_logger().info("Synchronizing current_q with robot pose...")
+
+        # Wait for pose to be available (from odom_callback)
+        max_wait = 5.0  # seconds
+        wait_time = 0.0
+        while self.current_pose is None and wait_time < max_wait:
+            rclpy.spin_once(self, timeout_sec=0.1)
+            wait_time += 0.1
+
+        if self.current_pose is not None:
+            with self.pose_lock:
+                x, y, yaw = self.current_pose
+                # Update current_q chassis joints with actual position
+                self.current_q[0] = x    # chassis_x_joint
+                self.current_q[1] = y    # chassis_y_joint
+                self.current_q[2] = yaw  # chassis_rotation_joint
+                self.get_logger().info(
+                    f"Synchronized current_q chassis to map pose: x={x:.3f}, y={y:.3f}, yaw={yaw:.3f}"
+                )
+        else:
+            self.get_logger().warn(
+                "Failed to synchronize current_q with pose after 5 seconds, using default [0, 0, π]"
+            )
+
     def _tf_thread_worker(self):
         """Worker function for the dedicated TF listener thread"""
         try:
@@ -338,23 +367,46 @@ class MobileIKController(Node):
                 return relative_rotation @ current_fk[:3, :3]
     
     def odom_callback(self, msg):
-        """Callback for odometry messages to get current robot pose"""
-        with self.odom_lock:
-            # Extract position
-            x = msg.pose.pose.position.x
-            y = msg.pose.pose.position.y
-            
-            # Extract orientation and convert to yaw angle
-            quat = msg.pose.pose.orientation
-            # Convert quaternion to euler angles to get yaw
-            quat_array = [quat.w, quat.x, quat.y, quat.z]
-            # Extract yaw from quaternion (rotation around z-axis)
-            # yaw = atan2(2*(w*z + x*y), 1 - 2*(y^2 + z^2))
-            yaw = np.arctan2(2.0 * (quat.w * quat.z + quat.x * quat.y),
-                            1.0 - 2.0 * (quat.y * quat.y + quat.z * quat.z))
-            
-            self.current_odom_pose = (x, y, yaw)
-            self.get_logger().debug(f"Odom pose: x={x:.3f}, y={y:.3f}, yaw={yaw:.3f}")
+        """Callback for odometry messages to get current robot pose
+        Now queries TF for map frame position instead of using odom directly"""
+        try:
+            # Query TF for robot pose in map frame (high frequency ~30Hz)
+            transform = self.tf_buffer.lookup_transform(
+                'map',              # target frame
+                'base_footprint',   # source frame
+                rclpy.time.Time(),  # get latest available
+                timeout=Duration(seconds=0.1)
+            )
+
+            with self.pose_lock:
+                # Extract position from transform
+                x = transform.transform.translation.x
+                y = transform.transform.translation.y
+
+                # Extract orientation and convert to yaw angle
+                quat = transform.transform.rotation
+                yaw = np.arctan2(2.0 * (quat.w * quat.z + quat.x * quat.y),
+                                1.0 - 2.0 * (quat.y * quat.y + quat.z * quat.z))
+
+                self.current_pose = (x, y, yaw)
+                self.get_logger().debug(f"Map pose: x={x:.3f}, y={y:.3f}, yaw={yaw:.3f}")
+
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException) as e:
+            # If map frame not available, fallback to odom frame
+            self.get_logger().debug(f"TF lookup failed, using odom: {e}")
+            with self.pose_lock:
+                # Extract position from odom message
+                x = msg.pose.pose.position.x
+                y = msg.pose.pose.position.y
+
+                # Extract orientation and convert to yaw angle
+                quat = msg.pose.pose.orientation
+                yaw = np.arctan2(2.0 * (quat.w * quat.z + quat.x * quat.y),
+                                1.0 - 2.0 * (quat.y * quat.y + quat.z * quat.z))
+
+                self.current_pose = (x, y, yaw)
+                self.get_logger().debug(f"Odom pose: x={x:.3f}, y={y:.3f}, yaw={yaw:.3f}")
     
     def target_poses_callback(self, msg):
         """Callback for target poses array (left arm first, right arm second)"""
@@ -552,7 +604,7 @@ class MobileIKController(Node):
         """Publish 5 interpolated frames from zero position to standby target"""
         try:
             self.get_logger().info(f"Starting smooth standby sequence ({STANDBY_NUM_FRAMES} frames)...")
-            
+
             init_position = np.zeros(len(self.standby_target))
             
             for i in range(STANDBY_NUM_FRAMES):
@@ -1001,11 +1053,11 @@ class MobileIKController(Node):
         """Extract chassis motion and publish as cmd_vel with noise filtering"""
         try:
             # Get current pose from odometry
-            with self.odom_lock:
-                if self.current_odom_pose is None:
+            with self.pose_lock:
+                if self.current_pose is None:
                     self.get_logger().warn("No odometry data received yet")
                     return
-                current_x, current_y, current_theta = self.current_odom_pose
+                current_x, current_y, current_theta = self.current_pose
             
             # Get target chassis pose from IK solution
             target_x, target_y, target_theta = self.ik_solver.get_chassis_pose(q)
@@ -1307,21 +1359,30 @@ def main(args=None):
         
         print("Mobile IK Controller with Obstacle Avoidance started.")
         print(f"Startup mode: {'IK sequence' if parsed_args.use_ik else 'Standard sequence'}")
+        print("")
         print("Subscribed to:")
         print("  - /demo_target_poses (geometry_msgs/PoseArray) - expects 2 poses: [left_arm, right_arm]")
-        print("  - /points_dep (sensor_msgs/PointCloud2) - obstacle detection")
+        print("  - /odom (nav_msgs/Odometry) - robot odometry for chassis control")
+        print("  - /points_dep (sensor_msgs/PointCloud2) - obstacle detection (optional)")
+        print("  - /mode (std_msgs/String) - current operation mode")
+        print("  - /mocap_frame_info (diagnostic_msgs/DiagnosticArray) - frame synchronization")
         print("")
         print("Publishing:")
-        print("  - All joint states (including chassis) to /joint_states (sensor_msgs/JointState) in world frame")
-        print("  - FK results for debugging to /fk_results (geometry_msgs/PoseArray)")
-        print("  - Collision distances to /collision_distances (std_msgs/Float32MultiArray)")
-        print("  - SDF visualization to /sdf_visualization (visualization_msgs/MarkerArray)")
-        print("  - Processed obstacles to /processed_obstacles (sensor_msgs/PointCloud2)")
+        joint_state_topic = '/joint_commands' if parsed_args.use_ik else '/ik/joint_states'
+        print(f"  - {joint_state_topic} (sensor_msgs/JointState) - all joint states in world frame")
+        print("  - /upper_body_controller/commands (std_msgs/Float64MultiArray) - upper body joint commands")
+        print("  - /cmd_vel (geometry_msgs/Twist) - chassis velocity commands")
+        print("  - /ik/current_eef_poses (geometry_msgs/PoseArray) - current end-effector poses (FK)")
+        print("  - /current_poses (geometry_msgs/PoseArray) - current ARM2_LEFT and ARM2_RIGHT poses")
+        print("  - /collision_distances (std_msgs/Float32MultiArray) - distances to obstacles")
+        print("  - /sdf_visualization (visualization_msgs/MarkerArray) - SDF grid visualization")
+        print("  - /processed_obstacles (sensor_msgs/PointCloud2) - filtered obstacle points")
         print("")
         print("Features:")
         print("  - Signed Distance Field (SDF) for efficient obstacle representation")
-        print("  - Real-time collision checking with robot links") 
+        print("  - Real-time collision checking with robot links")
         print("  - Obstacle avoidance integrated into IK optimization")
+        print("  - Smooth standby sequence with action server support")
         print("")
         print("Usage:")
         print("  python3 kinematics/mobile_ik_controller.py              # Use standard startup sequence")

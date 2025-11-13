@@ -724,4 +724,3 @@ def test():
 # Test function for the SDF with comprehensive visualization
 if __name__ == "__main__":
     test()
-

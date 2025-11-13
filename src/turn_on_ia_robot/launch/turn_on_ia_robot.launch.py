@@ -23,10 +23,22 @@ def generate_launch_description():
 #     ekf_carto_config = Path(get_package_share_directory('turn_on_ia_robot'), 'config', 'ekf_carto.yaml')
     imu_config = Path(get_package_share_directory('turn_on_ia_robot'), 'config', 'imu.yaml')
 
+    # 获取配置文件路径
+    twist_mux_config = os.path.join(bringup_dir, 'config', 'twist_mux.yaml')
     
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     # 声明Cartographer SLAM启动参数（默认关闭），用于控制是否启用Cartographer建图
     carto_slam = LaunchConfiguration('carto_slam', default='false')
     carto_slam_dec = DeclareLaunchArgument('carto_slam', default_value='false')
+    enable_emergency_stop = LaunchConfiguration('enable_emergency_stop')
+
+    declare_enable_emergency_stop_cmd = DeclareLaunchArgument(
+        'enable_emergency_stop',
+        default_value='False',
+        description='是否启用超声波紧急停止安全系统')
+
+
+
 
     # 包含机器人基础TCP通信启动文件，禁用内置IMU（当前配置为TCP控制模式）
     wheeltec_robot = IncludeLaunchDescription(
@@ -45,8 +57,7 @@ def generate_launch_description():
     
 
 
-    #TODO此处为雷达安装位置 后续视觉需要重新修改
-    
+    #TODO 此处为雷达安装位置 后续视觉需要重新修改
     base_to_imu = launch_ros.actions.Node(
             package='tf2_ros', 
             executable='static_transform_publisher', 
@@ -54,12 +65,12 @@ def generate_launch_description():
             arguments=['0', '0', '0','0', '0','0','base_footprint','imu_link'],
     )
 
-    # laser
+    # laser 到 base_footprint 的静态变换
     base_to_laser = launch_ros.actions.Node(
             package='tf2_ros', 
             executable='static_transform_publisher', 
             name='base_to_laser',
-            arguments=['-0.05', '0', '0','-1.570796', '0','0','base_footprint','laser'],
+            arguments=['-0.05', '0', '0.0','-1.5708', '0','0','base_footprint','laser'],
     )      
 
 
@@ -71,7 +82,21 @@ def generate_launch_description():
         parameters=[imu_config]
     )
     
-              
+    # 包含安全系统（超声波紧急停止 + twist_mux）
+    safety_system_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(bringup_dir, 'launch', 'safety_system.launch.py')
+        ),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'safety_threshold': '0.30',
+            'hysteresis_threshold': '0.40',
+            'enable_emergency_stop': enable_emergency_stop,
+        }.items(),
+        condition=IfCondition(enable_emergency_stop)  # 仅当启用紧急停止时才包含此启动文件
+    )
+
+    
     # 加载机器人模型
     # 加载ia_robot.urdf
     ia_robot_urdf = os.path.join(get_package_share_directory('ia_robot_urdf'), 'urdf', 'ia_robot_model.urdf')
@@ -85,33 +110,50 @@ def generate_launch_description():
     )    
 
 
-
+    # Twist Mux 节点 - 始终运行以管理速度命令优先级
+    # 这确保了导航命令 (/cmd_vel_nav) 和最终机器人命令 (/cmd_vel) 的清晰分离
+    twist_mux_node = launch_ros.actions.Node(
+        package='twist_mux',
+        executable='twist_mux',
+        name='twist_mux',
+        output='screen',
+        parameters=[
+            twist_mux_config,
+            {'use_sim_time': use_sim_time}
+        ],
+        remappings=[
+            # twist_mux 将根据配置文件处理主题映射
+            # 主输出是 /cmd_vel 到机器人
+            ('cmd_vel_out', 'cmd_vel'),
+        ]
+    )
 
 
     # 启动描述对象：组装所有启动组件
     ld = LaunchDescription()
-
-    # 添加机器人模型描述（启用小型机器人模型）
-#     ld.add_action(minibot_type)
+    # 添加声明启动选项
+    ld.add_action(declare_enable_emergency_stop_cmd)
+    
     # 添加Cartographer SLAM启动参数声明
     ld.add_action(carto_slam_dec)
     # 添加机器人基础TCP通信组件
     ld.add_action(wheeltec_robot)
-    # 添加静态TF变换节点
-#     ld.add_action(base_to_link)
-#     ld.add_action(base_to_gyro)
+
     ld.add_action(base_to_laser)
-#     ld.add_action(map_to_odom_combined)
-    # 添加关节状态发布器
-#     ld.add_action(joint_state_publisher_node)
-    # 添加机器人状态发布器节点
-    ld.add_action(robot_state_publisher_node)
+
+
     ld.add_action(base_to_imu)
+
+    # 添加机器人模型
+    ld.add_action(robot_state_publisher_node)
+
+    ld.add_action(twist_mux_node)
+    # 添加超声波紧急停止安全系统
+    ld.add_action(safety_system_launch)
     # 添加IMU滤波节点
     # ld.add_action(imu_filter_node)    
     # 添加EKF节点
-#     ld.add_action(robot_ekf)
-    #TODO 雷达会打开rviz    
+#     ld.add_action(robot_ekf)  
     
     # 返回最终组装的启动描述
     return ld

@@ -1359,6 +1359,7 @@ void turn_on_robot::Tcp_Cmd_Data_Deal(char* Receive_Tcp_Data,int num){
         //RCLCPP_INFO(this->get_logger(),"CMD_TYPE_WHEEL_MOTOR");
         Wheel_Data_Deal(Receive_Tcp_Data,num);
         break;*/
+      case CMD_TYPE_RS485_MOTOR: 
       case CMD_TYPE_JOINT_MOTOR: 
       case CMD_TYPE_WHEEL_MOTOR:
         Robot_Data_Deal(Receive_Tcp_Data,num);

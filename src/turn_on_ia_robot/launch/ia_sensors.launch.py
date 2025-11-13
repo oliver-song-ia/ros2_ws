@@ -18,77 +18,30 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='False')
     launch_dir = os.path.join(bringup_dir, 'launch')
+    # 底盘通讯节点启动
     wheeltec_robot = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'turn_on_ia_robot.launch.py')),
     )
+    # 雷达节点启动
     lidar_ros = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'ia_lidar.launch.py')),
     )
-    # 添加 fdilink_ahrs 驱动的 launch 文件
+    # imu节点启动
     ahrs_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             get_package_share_directory('fdilink_ahrs'),  # 获取 fdilink_ahrs 包的路径
             '/launch/ahrs_driver.launch.py'  # ahrs_driver.launch.py 相对于包的路径
         ])
     )
-
+    # 旧版imu节点启动
     imu_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(imu_launch_dir,  'rviz_and_imu.launch.py')),)
+        PythonLaunchDescriptionSource(os.path.join(imu_config_dir,  'rviz_and_imu.launch.py')),)
 
-    # # ros2 launch ia_robot ctrl_ia_robot.launch.py
+    # 底盘控制计算
     swerve_ctrl = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(ia_robot_dir, 'launch', 'ctrl_swerve_drive.launch.py')),
     )
-
-    # Include safety system (ultrasonic emergency stop + twist_mux)
-    safety_system_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(ia_robot_dir, 'launch', 'safety_system.launch.py')
-        ),
-        launch_arguments={
-            'use_sim_time': use_sim_time,
-            'safety_threshold': '0.15',
-            'hysteresis_threshold': '0.2',
-            'enable_emergency_stop': 'True',
-        }.items(),
-        condition=IfCondition('True')
-    )
-    ia_robot_urdf_dir = get_package_share_directory('ia_robot_urdf')
-
-    urdf_file = os.path.join(ia_robot_urdf_dir, 'urdf', 'ia_robot.urdf')
-
-    # Robot State Publisher - publishes the robot model from URDF
-    robot_state_publisher_node = launch_ros.actions.Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='screen',
-        parameters=[{
-            'robot_description': open(urdf_file).read(),
-            'use_sim_time': use_sim_time
-        }]
-    )
-    # Twist Mux node - Always runs to manage velocity command priorities
-    # This ensures clean separation between navigation commands (/cmd_vel_nav)
-    # and the final robot commands (/cmd_vel)
-    twist_mux_config = os.path.join(ia_robot_dir, 'config', 'twist_mux.yaml')
-
-    twist_mux_node = launch_ros.actions.Node(
-        package='twist_mux',
-        executable='twist_mux',
-        name='twist_mux',
-        output='screen',
-        parameters=[
-            twist_mux_config,
-            {'use_sim_time': use_sim_time}
-        ],
-        remappings=[
-            # twist_mux will handle topic mapping based on config file
-            # Main output is /cmd_vel to the robot
-            ('cmd_vel_out', 'cmd_vel'),
-        ]
-    )
-
+    # rviz节点启动
     rviz_node = launch_ros.actions.Node(
         package='rviz2',
         executable='rviz2',
@@ -102,10 +55,9 @@ def generate_launch_description():
         lidar_ros,      # lidar
         ahrs_launch,  #IMU
         # imu_launch,     #IMU
-        swerve_ctrl,    #joint_control
-        # safety_system_launch,
-        # twist_mux_node,
-        # rviz_node
+        swerve_ctrl,    
+        # rviz_node,    #rviz
+
         ]
     )
 
