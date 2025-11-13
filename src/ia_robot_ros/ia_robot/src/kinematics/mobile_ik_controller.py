@@ -25,7 +25,6 @@ from transforms3d import quaternions
 import threading
 import time
 import argparse
-from gs_ros_interfaces.srv import SetEntityPose
 from ia_robot_interfaces.action import MoveToStandby
 from ia_robot_interfaces.srv import SetJointLock
 
@@ -189,7 +188,6 @@ class MobileIKController(Node):
         )
         self.frame_idx_loop = float('inf')
         self.publish_pose = False
-        self.set_entity_pose_service = self.create_client(SetEntityPose, '/set_entity_pose')
 
         # Get joint names from IK solver
         self.joint_names = self.ik_solver.get_joint_names()
@@ -545,67 +543,15 @@ class MobileIKController(Node):
             self.get_logger().info(f"New loop detected: {frame_idx} < {self.frame_idx_loop}.")
 
     def set_pose(self, q):
-        x, y, theta = self.ik_solver.get_chassis_pose(q)
-        z = 0.0
-
-        # Convert theta to quaternion (rotation around z-axis)
-        quat = quaternions.axangle2quat([0, 0, 1], theta)  # [w, x, y, z]
-
-        request = SetEntityPose.Request()
-        request.entity_name = "robot_one"
-        request.pose = Pose(
-            position=Point(x=x, y=y, z=z),
-            orientation=Quaternion(x=quat[1], y=quat[2], z=quat[3], w=quat[0])
-        )
-        # call service asynchronously to avoid deadlock
-        future = self.set_entity_pose_service.call_async(request)
-        future.add_done_callback(self.set_pose_response_callback)
-        self.get_logger().info(f"Setting pose to {request.pose.position}")
         self.publish_pose = False
 
     def set_pose_response_callback(self, future):
-        """Callback to handle the set entity pose service response"""
-        try:
-            response = future.result()
-            if response.success:
-                self.get_logger().info(f'Successfully set pose')
-            else:
-                self.get_logger().error(f'Failed to set pose: {response.message}')
-        except Exception as e:
-            self.get_logger().error(f'Service call failed: {e}')
+        pass
     
     def publish_standby_sequence(self):
         """Publish 5 interpolated frames from zero position to standby target"""
         try:
             self.get_logger().info(f"Starting smooth standby sequence ({STANDBY_NUM_FRAMES} frames)...")
-            
-            # First, set the robot pose using the service
-            self.get_logger().info("Setting initial robot pose via service...")
-            request = SetEntityPose.Request()
-            request.entity_name = "robot_one"
-            request.pose = Pose(
-                position=Point(x=0.0, y=-1.7, z=0.0),
-                orientation=Quaternion(x=0.0, y=0.0, z=0.7071, w=0.7071)
-            )
-            
-            # Call service synchronously during standby
-            if self.set_entity_pose_service.wait_for_service(timeout_sec=5.0):
-                future = self.set_entity_pose_service.call_async(request)
-                rclpy.spin_until_future_complete(self, future, timeout_sec=5.0)
-                
-                if future.result() is not None:
-                    response = future.result()
-                    if response.success:
-                        self.get_logger().info(f'Successfully set initial pose: x=0.0, y=-1.7, z=0.0, yaw=90deg')
-                    else:
-                        self.get_logger().warn(f'Failed to set pose: {response.message}')
-                else:
-                    self.get_logger().warn('Service call failed or timed out')
-            else:
-                self.get_logger().warn('SetEntityPose service not available')
-            
-            # Short delay to let the pose update take effect
-            time.sleep(0.5)
             
             init_position = np.zeros(len(self.standby_target))
             

@@ -21,7 +21,7 @@ def generate_launch_description():
     # Robot URDF file path
     # Use ia_robot.urdf for real robot (no virtual IK joints that conflict with odom)
     # ia_robot_ik.urdf is only for MoveIt simulation with mobile manipulation
-    urdf_file = os.path.join(ia_robot_urdf_dir, 'urdf', 'ia_robot.urdf')
+    urdf_file = os.path.join(ia_robot_urdf_dir, 'urdf', 'ia_robot_model.urdf')
     wheeltec_robot = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'turn_on_wheeltec_robot.launch.py')),
     )

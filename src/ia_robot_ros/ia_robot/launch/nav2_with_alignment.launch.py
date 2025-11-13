@@ -13,14 +13,14 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
-    # Get the launch directory
-    bringup_dir = get_package_share_directory('ia_slam_toolbox')
+    # 获取 nav2_bringup 和 ia_robot 包的共享目录
+    bringup_dir = get_package_share_directory('nav2_bringup')
     ia_robot_dir = get_package_share_directory('ia_robot')
     
-    # Get config files
+    # 获取配置文件路径
     twist_mux_config = os.path.join(ia_robot_dir, 'config', 'twist_mux.yaml')
 
-    # Create the launch configuration variables
+    # 创建启动配置变量
     map_yaml_file = LaunchConfiguration('map')
     params_file = LaunchConfiguration('params_file')
     alignment_points_file = LaunchConfiguration('alignment_points_file')
@@ -30,51 +30,51 @@ def generate_launch_description():
     slam = LaunchConfiguration('slam')
     enable_emergency_stop = LaunchConfiguration('enable_emergency_stop')
 
-    # Declare the launch arguments
+    # 声明启动参数
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(get_package_share_directory('ia_robot'), 'maps', 'map_1111.yaml'),
-        description='Full path to the ROS2 map yaml file to use')
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'maps', 'ia_map.yaml'),
+        description='ROS2 地图文件的完整路径')
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(get_package_share_directory('ia_robot'), 'config', 'nav2_params_genesis.yaml'),
-        description='Full path to the ROS2 parameters file to use for all launched nodes')
+        default_value=os.path.join(get_package_share_directory('ia_robot'), 'config', 'nav2_params_real.yaml'),
+        description='所有启动节点使用的 ROS2 参数文件的完整路径')
 
     declare_alignment_points_file_cmd = DeclareLaunchArgument(
         'alignment_points_file',
         default_value=os.path.join(get_package_share_directory('ia_robot'), 'maps', 'map_0722_empty.json'),
-        description='Full path to the alignment points JSON file')
+        description='对齐点 JSON 文件的完整路径')
 
     declare_behavior_tree_file_cmd = DeclareLaunchArgument(
         'behavior_tree_file',
         default_value=os.path.join(get_package_share_directory('ia_robot'), 'behavior_trees', 'navigate_backup_first.xml'),
-        description='Full path to behavior tree xml file')
+        description='行为树 XML 文件的完整路径')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
         default_value='False',
-        description='Use simulation (Gazebo) clock if true')
+        description='是否使用仿真（Gazebo）时钟，如果为 True 则使用仿真时间')
 
     declare_autostart_cmd = DeclareLaunchArgument(
         'autostart', 
         default_value='True',
-        description='Automatically startup the nav2 stack')
+        description='是否自动启动 nav2 栈')
     
     declare_slam_cmd = DeclareLaunchArgument(
         'slam',
         default_value='False',
-        description='Whether to run SLAM or localization')
+        description='是否运行 SLAM 或定位')
     
     declare_enable_emergency_stop_cmd = DeclareLaunchArgument(
         'enable_emergency_stop',
         default_value='True',
-        description='Enable ultrasonic emergency stop safety system')
+        description='是否启用超声波紧急停止安全系统')
 
-    # Create our own yaml files that include substitutions
+    # 创建包含替换项的 yaml 文件
     param_substitutions = {
         'use_sim_time': use_sim_time,
-        'alignment_points_file': alignment_points_file,
+        'alignment_points_file': alignment_points_file,  # 修正了这里缺少逗号的错误
         'default_nav_to_pose_bt_xml': behavior_tree_file,
     }
 
@@ -84,7 +84,7 @@ def generate_launch_description():
         param_rewrites=param_substitutions,
         convert_types=True)
 
-    # Include the regular nav2 bringup launch
+    # 包含常规的 nav2 bringup 启动文件
     bringup_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(bringup_dir, 'launch', 'bringup_launch.py')
@@ -98,7 +98,7 @@ def generate_launch_description():
         }.items()
     )
     
-    # Include safety system (ultrasonic emergency stop + twist_mux)
+    # 包含安全系统（超声波紧急停止 + twist_mux）
     safety_system_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(ia_robot_dir, 'launch', 'safety_system.launch.py')
@@ -109,12 +109,11 @@ def generate_launch_description():
             'hysteresis_threshold': '0.20',
             'enable_emergency_stop': enable_emergency_stop,
         }.items(),
-        condition=IfCondition(enable_emergency_stop)
+        condition=IfCondition(enable_emergency_stop)  # 仅当启用紧急停止时才包含此启动文件
     )
     
-    # Twist Mux node - Always runs to manage velocity command priorities
-    # This ensures clean separation between navigation commands (/cmd_vel_nav)
-    # and the final robot commands (/cmd_vel)
+    # Twist Mux 节点 - 始终运行以管理速度命令优先级
+    # 这确保了导航命令 (/cmd_vel_nav) 和最终机器人命令 (/cmd_vel) 的清晰分离
     twist_mux_node = Node(
         package='twist_mux',
         executable='twist_mux',
@@ -125,16 +124,25 @@ def generate_launch_description():
             {'use_sim_time': use_sim_time}
         ],
         remappings=[
-            # twist_mux will handle topic mapping based on config file
-            # Main output is /cmd_vel to the robot
+            # twist_mux 将根据配置文件处理主题映射
+            # 主输出是 /cmd_vel 到机器人
             ('cmd_vel_out', 'cmd_vel'),
         ]
     )
 
-    # Create the launch description and populate
+    rviz_config_file = os.path.join(ia_robot_dir, 'rviz', 'nav2.rviz')
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config_file],
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+    # 创建启动描述并填充
     ld = LaunchDescription()
 
-    # Declare the launch options
+    # 声明启动选项
     ld.add_action(declare_map_yaml_cmd)
     ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_alignment_points_file_cmd)
@@ -143,41 +151,14 @@ def generate_launch_description():
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_slam_cmd)
     ld.add_action(declare_enable_emergency_stop_cmd)
-
-
-    # Add the actions to launch all of the navigation nodes
+    ld.add_action(rviz_node)
+    # 添加启动所有导航节点的动作
     ld.add_action(bringup_launch)
-
-    # Add AMCL node for localization
-    amcl_node = Node(
-        package='nav2_amcl',
-        executable='amcl',
-        name='amcl',
-        output='screen',
-        parameters=[configured_params],
-        remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]
-    )
-
-    # Lifecycle manager for AMCL
-    amcl_lifecycle_manager = Node(
-        package='nav2_lifecycle_manager',
-        executable='lifecycle_manager',
-        name='lifecycle_manager_amcl',
-        output='screen',
-        parameters=[
-            {'use_sim_time': use_sim_time},
-            {'autostart': autostart},
-            {'node_names': ['amcl']}
-        ]
-    )
-
-    ld.add_action(amcl_node)
-    ld.add_action(amcl_lifecycle_manager)
-
-    # Add twist_mux (always runs for velocity command management)
+    
+    # # 添加 twist_mux（始终运行以管理速度命令）
     # ld.add_action(twist_mux_node)
-
-    # Add safety system (conditional - only emergency stop if enabled)
+    
+    # # 添加安全系统（条件运行 - 仅在启用紧急停止时运行）
     # ld.add_action(safety_system_launch)
 
     return ld

@@ -1325,16 +1325,16 @@ void turn_on_robot::Robot_Data_Deal(char* data,int len){
   }else{
     
     if(data[6]==0x11){
-      robot_joint_status.velocity[15] = WHEEL_FRONT_LEFT*Odom_Trans(data[9],data[10])*160.0/60.0;
+      robot_joint_status.velocity[15] = WHEEL_FRONT_LEFT*Odom_Trans(data[9],data[10])*160.0/60.0*STM_PI;
       robot_joint_status.position[15] = 0;
-      robot_joint_status.velocity[17] = WHEEL_REAR_LEFT*Odom_Trans(data[9],data[10])*160.0/60.0;
+      robot_joint_status.velocity[17] = WHEEL_REAR_LEFT*Odom_Trans(data[11],data[12])*160.0/60.0*STM_PI;
       robot_joint_status.position[17] = 0;
       
       joint_publish_flag |=0x30000;
     }else{
-      robot_joint_status.velocity[16] = WHEEL_FRONT_RIGHT*Odom_Trans(data[11],data[12])*160.0/60.0;
+      robot_joint_status.velocity[16] = WHEEL_FRONT_RIGHT*Odom_Trans(data[9],data[10])*160.0/60.0*STM_PI;
       robot_joint_status.position[16] = 0;
-      robot_joint_status.velocity[18] = WHEEL_REAR_RIGTH*Odom_Trans(data[11],data[12])*160.0/60.0;
+      robot_joint_status.velocity[18] = WHEEL_REAR_RIGTH*Odom_Trans(data[11],data[12])*160.0/60.0*STM_PI;
       robot_joint_status.position[18] = 0;
       joint_publish_flag |=0xc0000;
     }

@@ -78,10 +78,10 @@ PointCloudToLaserScanNode::PointCloudToLaserScanNode(const rclcpp::NodeOptions &
   // Robot self-filter parameters (box filter)
   // Robot size: 1.1m x 0.6m
   filter_robot_box_ = this->declare_parameter("filter_robot_box", true);
-  robot_box_min_x_ = this->declare_parameter("robot_box_min_x", -0.6);
-  robot_box_max_x_ = this->declare_parameter("robot_box_max_x", 0.6);
-  robot_box_min_y_ = this->declare_parameter("robot_box_min_y", -1);
-  robot_box_max_y_ = this->declare_parameter("robot_box_max_y", 1);
+  robot_box_min_x_ = this->declare_parameter("robot_box_min_x", -0.3);
+  robot_box_max_x_ = this->declare_parameter("robot_box_max_x", 0.3);
+  robot_box_min_y_ = this->declare_parameter("robot_box_min_y", -0.6);
+  robot_box_max_y_ = this->declare_parameter("robot_box_max_y", 0.6);
 
   pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan", rclcpp::SensorDataQoS());
 
@@ -258,6 +258,50 @@ void PointCloudToLaserScanNode::cloudCallback(
         } else {
           scan_msg->ranges[i] = scan_msg->range_max + inf_epsilon_;
         }
+      }
+    }
+  }
+
+  // Filter specified angle ranges in robot coordinate system
+  // Note: laser frame is rotated 90° relative to base_link
+  // Robot forward (base_link 0°) = Laser 90° (π/2)
+  constexpr double robot_forward_in_laser = M_PI / 2.0;  // 90 degrees
+
+  // Filter range 1: ±(12.5° ~ 27.5°) from robot forward
+  constexpr double filter1_inner_deg = 10;
+  constexpr double filter1_outer_deg = 30;
+  constexpr double filter1_inner_rad = filter1_inner_deg * M_PI / 180.0;
+  constexpr double filter1_outer_rad = filter1_outer_deg * M_PI / 180.0;
+
+  // Filter range 2: ±(115° ~ 145°) from robot forward
+  constexpr double filter2_inner_deg = 100.0;
+  constexpr double filter2_outer_deg = 150.0;
+  constexpr double filter2_inner_rad = filter2_inner_deg * M_PI / 180.0;
+  constexpr double filter2_outer_rad = filter2_outer_deg * M_PI / 180.0;
+
+  for (size_t i = 0; i < scan_msg->ranges.size(); ++i) {
+    double angle = scan_msg->angle_min + i * scan_msg->angle_increment;
+
+    // Calculate angular distance from robot forward direction
+    double angle_diff = angle - robot_forward_in_laser;
+
+    // Normalize to [-π, π]
+    while (angle_diff > M_PI) angle_diff -= 2.0 * M_PI;
+    while (angle_diff < -M_PI) angle_diff += 2.0 * M_PI;
+
+    double abs_angle_diff = std::abs(angle_diff);
+
+    // Check if in filter range 1: ±(12.5° ~ 27.5°)
+    bool in_filter1 = (abs_angle_diff >= filter1_inner_rad && abs_angle_diff <= filter1_outer_rad);
+
+    // Check if in filter range 2: ±(115° ~ 145°)
+    bool in_filter2 = (abs_angle_diff >= filter2_inner_rad && abs_angle_diff <= filter2_outer_rad);
+
+    if (in_filter1 || in_filter2) {
+      if (use_inf_) {
+        scan_msg->ranges[i] = std::numeric_limits<double>::infinity();
+      } else {
+        scan_msg->ranges[i] = scan_msg->range_max + inf_epsilon_;
       }
     }
   }

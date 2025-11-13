@@ -540,7 +540,7 @@ controller_interface::return_type SwerveController::update(
     else
     {
       // Apply calibration factor to match real-world odometry
-      constexpr double K = 0.6634;
+      constexpr double K = 0.6634/3.14;
       velocity_array[i] = wheel_handles_[i]->get_feedback() * K;
       steering_angle_array[i] = axle_handles_[i]->get_feedback();
     }
