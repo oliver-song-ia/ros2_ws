@@ -267,15 +267,15 @@ void PointCloudToLaserScanNode::cloudCallback(
   // Robot forward (base_link 0°) = Laser 90° (π/2)
   constexpr double robot_forward_in_laser = M_PI / 2.0;  // 90 degrees
 
-  // Filter range 1: ±(12.5° ~ 27.5°) from robot forward
-  constexpr double filter1_inner_deg = 10;
-  constexpr double filter1_outer_deg = 30;
+  // Filter range 1: ±(5.0° ~ 40.0°)
+  constexpr double filter1_inner_deg = 15.0;
+  constexpr double filter1_outer_deg = 35.0;
   constexpr double filter1_inner_rad = filter1_inner_deg * M_PI / 180.0;
   constexpr double filter1_outer_rad = filter1_outer_deg * M_PI / 180.0;
 
-  // Filter range 2: ±(115° ~ 145°) from robot forward
-  constexpr double filter2_inner_deg = 100.0;
-  constexpr double filter2_outer_deg = 150.0;
+  // Filter range 2: ±(145.0° ~ 167.5°)
+  constexpr double filter2_inner_deg = 145.0;
+  constexpr double filter2_outer_deg = 170.0;
   constexpr double filter2_inner_rad = filter2_inner_deg * M_PI / 180.0;
   constexpr double filter2_outer_rad = filter2_outer_deg * M_PI / 180.0;
 

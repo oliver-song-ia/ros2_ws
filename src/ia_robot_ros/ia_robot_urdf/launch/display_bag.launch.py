@@ -2,10 +2,7 @@
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
 import os
-
 from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
@@ -17,13 +14,6 @@ def generate_launch_description():
     rviz_config_file = os.path.join(pkg_share, 'config', 'urdf.rviz')
 
     return LaunchDescription([
-        # Declare arguments (like <arg>)
-        DeclareLaunchArgument(
-            'model',
-            default_value='',
-            description='Model argument (not used yet)'
-        ),
-
         # Set robot_description parameter
         Node(
             package='robot_state_publisher',
@@ -32,14 +22,8 @@ def generate_launch_description():
             parameters=[{'robot_description': open(urdf_file).read()}]
         ),
 
-        # Joint state publisher - subscribe to /ik/joint_states
-        Node(
-            package='joint_state_publisher',
-            executable='joint_state_publisher',
-            name='joint_state_publisher',
-            parameters=[{'source_list': ['/ik/joint_states']}],
-            remappings=[('/joint_states', '/joint_states')]
-        ),
+        # 注意：不启动 joint_state_publisher
+        # bag播放会提供 /joint_states 或 /ik/joint_states
 
         # RViz
         Node(

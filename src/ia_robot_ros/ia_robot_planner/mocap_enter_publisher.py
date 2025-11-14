@@ -38,8 +38,8 @@ class MocapEnterPublisher(Node):
         self.get_logger().info(f'Loaded {len(self.traj_data)} frames for trajectory {first_traj_id}')
 
         # Position offsets
-        self.x_offset = -0.8  # X-axis offset (1.5m to the left, negative x direction)
-        self.y_offset = 1.5   # Y-axis offset (1.5m in positive y direction)
+        self.x_offset = -0.5  # X-axis offset (1.5m to the left, negative x direction)
+        self.y_offset = 0.7   # Y-axis offset (1.5m in positive y direction)
 
         # Reset frame index for easy iteration
         self.traj_data.reset_index(drop=True, inplace=True)
@@ -99,6 +99,12 @@ class MocapEnterPublisher(Node):
         right1_pos = self.rotate_x_minus_90(right1_pos)
         right2_pos = self.rotate_x_minus_90(right2_pos)
 
+        # Apply rotation around Z-axis by 180 degrees: (x, y, z) -> (-x, -y, z)
+        left1_pos = self.rotate_z_180(left1_pos)
+        left2_pos = self.rotate_z_180(left2_pos)
+        right1_pos = self.rotate_z_180(right1_pos)
+        right2_pos = self.rotate_z_180(right2_pos)
+
         # Apply position offsets
         left1_pos[0] += self.x_offset
         left1_pos[1] += self.y_offset
@@ -146,6 +152,7 @@ class MocapEnterPublisher(Node):
                            row[f'{joint_name}_gt_y'] / 1000.0,
                            row[f'{joint_name}_gt_z'] / 1000.0])
             pos = self.rotate_x_minus_90(pos)
+            pos = self.rotate_z_180(pos)
             # Apply position offsets
             pos[0] += self.x_offset
             pos[1] += self.y_offset
@@ -213,6 +220,11 @@ class MocapEnterPublisher(Node):
         """Rotate point around X-axis by -90 degrees: (x, y, z) -> (x, -z, y)"""
         x, y, z = pos
         return np.array([x, -z, y])
+
+    def rotate_z_180(self, pos):
+        """Rotate point around Z-axis by 180 degrees: (x, y, z) -> (-x, -y, z)"""
+        x, y, z = pos
+        return np.array([-x, -y, z])
 
     def vector_to_quaternion(self, direction_vector):
         """Convert a direction vector to a quaternion"""

@@ -95,6 +95,10 @@ class MobileIKController(Node):
         }
         self.history_length = 5  # Number of samples for moving average
         self.velocity_threshold = 0.005  # Minimum velocity to publish (noise filter)
+
+        # Position error thresholds (deadzone)
+        self.position_error_threshold = 0.05  # 5cm position deadzone
+        self.angle_error_threshold = 0.1     # ~6 degrees angle deadzone
         
         # Target poses
         self.left_target = None
@@ -135,7 +139,9 @@ class MobileIKController(Node):
         self.tf_thread.start()
         
         # Publishers
-        joint_state_topic = '/joint_commands' if self.use_ik else '/ik/joint_states'
+        # When use_ik is True, publish upper body commands to /joint_commands_upper
+        # This will be merged with chassis commands in swerve_drive_controller
+        joint_state_topic = '/joint_commands_upper' if self.use_ik else '/ik/joint_states'
         self.joint_states_pub = self.create_publisher(JointState, joint_state_topic, 10)
         self.upper_body_commands_pub = self.create_publisher(Float64MultiArray, '/upper_body_controller/commands', 10)
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
@@ -1067,20 +1073,31 @@ class MobileIKController(Node):
             dx_world = target_x - current_x
             dy_world = target_y - current_y
             dtheta = target_theta - current_theta
-            
+
             # Handle angle wrapping
             if dtheta > np.pi:
                 dtheta -= 2 * np.pi
             elif dtheta < -np.pi:
                 dtheta += 2 * np.pi
-            
+
+            # Check if position error is within deadzone
+            position_error = np.sqrt(dx_world**2 + dy_world**2)
+            if position_error < self.position_error_threshold and abs(dtheta) < self.angle_error_threshold:
+                # Within deadzone, publish zero velocity
+                cmd_vel_msg = Twist()
+                self.cmd_vel_pub.publish(cmd_vel_msg)
+                self.get_logger().debug(
+                    f"Within deadzone: pos_err={position_error:.4f}m, angle_err={abs(dtheta):.4f}rad"
+                )
+                return
+
             # Transform world velocities to chassis frame using current orientation
             cos_theta = np.cos(current_theta)
             sin_theta = np.sin(current_theta)
-            
+
             vx_chassis = cos_theta * dx_world + sin_theta * dy_world
             vy_chassis = -sin_theta * dx_world + cos_theta * dy_world
-            
+
             # Calculate raw velocities
             raw_vx = vx_chassis / self.dt
             raw_vy = vy_chassis / self.dt

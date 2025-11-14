@@ -626,6 +626,15 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+9] = (uint8_t)((position>>8)&0xff);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+10] = (uint8_t)((position>>16)&0xff);
         send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+11] = (uint8_t)((position>>24)&0xff);
+      }else if((i==9)||(i==11)){
+        positon_step = (staus->position[i+2])/PI/2;  //弧度计算
+        position = -static_cast<int>(Pos_init_data[i+2]-positon_step*STM_ONE_CYCLE);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+6] = (i+3);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+7] = 0x1e;
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+8] = (uint8_t)(position&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+9] = (uint8_t)((position>>8)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+10] = (uint8_t)((position>>16)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+11] = (uint8_t)((position>>24)&0xff);
       }else{
         positon_step = (staus->position[i+2])/PI/2;  //弧度计算
         position = static_cast<int>(Pos_init_data[i+2]-positon_step*STM_ONE_CYCLE);
@@ -658,8 +667,164 @@ void turn_on_robot::Ia_Joint_Commands_Callback_Status_New(const sensor_msgs::msg
   send_data.cmd_len[0] = 0x00;
   send_data.cmd_len[1] = 10; //发送长度
 
-  send_data.cmd_data[0] = (uint8_t)(((int)staus->position[8])>>8)&0xff;
-  send_data.cmd_data[1] = (uint8_t)((int)staus->position[8])&0xff;
+  int rs485_position = (int)(staus->position[8])*1000;
+  send_data.cmd_data[0] = (uint8_t)((rs485_position)>>8)&0xff;
+  send_data.cmd_data[1] = (uint8_t)(rs485_position)&0xff;
+  #ifdef IA_USE_TCP
+    stm_all.tcp_truct_t.tcp_write((char*)&send_data,10); //发送tcp
+  #else
+    stm_all.udp_truct_t.udp_write((char*)&send_data,10); //发送tcp
+    //Ia_Write_Log_To_File((char*)&send_data,28);
+  #endif 
+
+  #endif
+}
+
+void turn_on_robot::Ia_Joint_Commands_Callback_Status_1(const sensor_msgs::msg::JointState::SharedPtr staus){
+  uint16_t crc; 
+  cmd_structure_t send_data;
+  uint16_t speed_data;
+  float round = PI*2;
+  float speed; 
+  send_data.cmd_head = MOTOR_HEAD_VALUE;
+
+  //发送轮毂指令
+  send_data.cmd_type = CMD_TYPE_WHEEL_MOTOR;
+  send_data.cmd_command[0] = 0x00;
+  send_data.cmd_command[1] = 0x00;
+  send_data.cmd_len[0] = 0x00;
+  send_data.cmd_len[1] = MOTOR_WHEEL_LEN*MOTOR_WHEEL_CMD_LEN+8;//0x1c;
+
+  for(int i=0;i<MOTOR_WHEEL_LEN;i++){
+      speed = WHEEL_POSITION[i]*(staus->velocity[WHEEL_SPEED_ID[i][1]])*60/round;  //转换为m/s
+      speed_data = static_cast<int>(speed);
+      
+      send_data.cmd_data[i*MOTOR_WHEEL_CMD_LEN] = 0x01;
+      send_data.cmd_data[i*MOTOR_WHEEL_CMD_LEN+1] = 0x01;
+      send_data.cmd_data[i*MOTOR_WHEEL_CMD_LEN+2] = (uint8_t)(speed_data/256);
+      send_data.cmd_data[i*MOTOR_WHEEL_CMD_LEN+3] = (uint8_t)(speed_data);
+      send_data.cmd_data[i*MOTOR_WHEEL_CMD_LEN+4] = 0x64;
+  }
+  
+
+  crc = com_crc((uint8_t*)&send_data,MOTOR_WHEEL_LEN*MOTOR_WHEEL_CMD_LEN+6);
+  send_data.cmd_data[MOTOR_WHEEL_LEN*MOTOR_WHEEL_CMD_LEN] = (crc>>8)&0xff;
+  send_data.cmd_data[MOTOR_WHEEL_LEN*MOTOR_WHEEL_CMD_LEN+1] = crc&0xff;   //尾
+
+  #ifdef IA_USE_TCP
+    stm_all.tcp_truct_t.tcp_write((char*)&send_data,MOTOR_WHEEL_LEN*MOTOR_WHEEL_CMD_LEN+8); //发送tcp
+  #else
+    stm_all.udp_truct_t.udp_write((char*)&send_data,MOTOR_WHEEL_LEN*MOTOR_WHEEL_CMD_LEN+8); //发送tcp
+    //Ia_Write_Log_To_File((char*)&send_data,28);
+  #endif 
+
+  //发送关节指令
+  send_data.cmd_type = CMD_TYPE_JOINT_MOTOR;
+  send_data.cmd_command[0] = 0x00;
+  send_data.cmd_command[1] = 0x00;
+  send_data.cmd_len[0] = 0x00;
+  send_data.cmd_len[1] = MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN+8; //发送长度
+  
+  float positon_step;
+  int32_t position;
+
+  for(int i=0;i<4;i++){
+      positon_step = (staus->position[i])/PI/2;  //弧度计算
+      position = static_cast<int>(Pos_init_data[i]-positon_step*STM_ONE_CYCLE);
+      
+      send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN] = (i+2);
+      send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+1] = 0x1e;
+      send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+2] = (uint8_t)(position&0xff);
+      send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+3] = (uint8_t)((position>>8)&0xff);
+      send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+4] = (uint8_t)((position>>16)&0xff);
+      send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+5] = (uint8_t)((position>>24)&0xff);
+  }
+  
+  crc = com_crc((uint8_t*)&send_data,MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN+6);
+  send_data.cmd_data[MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN] = (crc>>8)&0xff;
+  send_data.cmd_data[MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN+1] = crc&0xff;   //尾
+
+  #ifdef IA_USE_TCP
+    stm_all.tcp_truct_t.tcp_write((char*)&send_data,MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN+8); //发送tcp
+  #else
+    stm_all.udp_truct_t.udp_write((char*)&send_data,MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN+8); //发送tcp
+    //Ia_Write_Log_To_File((char*)&send_data,28);
+  #endif 
+
+}
+
+void turn_on_robot::Ia_Joint_Commands_Callback_Status_2(const sensor_msgs::msg::JointState::SharedPtr staus){
+  // RCLCPP_INFO(this->get_logger(),"Ia_Joint_Commands_Callback_Status_New");
+  uint16_t crc; 
+  cmd_structure_t send_data;
+  uint16_t speed_data;
+  float round = PI*2;
+  float speed; 
+  send_data.cmd_head = MOTOR_HEAD_VALUE;
+
+
+  //发送关节指令
+  send_data.cmd_type = CMD_TYPE_JOINT_MOTOR;
+  send_data.cmd_command[0] = 0x00;
+  send_data.cmd_command[1] = 0x00;
+  send_data.cmd_len[0] = 0x00;
+  send_data.cmd_len[1] = MOTOR_JOINT_CMD_LEN*MOTOR_JOINT_LEN+8; //发送长度
+   
+  float positon_step;
+  int32_t position;
+
+  for(int i=0;i<8;i++){
+      positon_step = (staus->position[i])/PI/2;  //弧度计算
+      position = static_cast<int>(Pos_init_data[i]-positon_step*STM_ONE_CYCLE);
+      if(i<2){   //胸部两个需要处理
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN] = (i+8);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+1] = 0x1e;
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+2] = (uint8_t)(position&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+3] = (uint8_t)((position>>8)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+4] = (uint8_t)((position>>16)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+5] = (uint8_t)((position>>24)&0xff);
+      
+        position = -(position);   //TODO 检查是否适配
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+6] = (i+9);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+7] = 0x1e;
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+8] = (uint8_t)(position&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+9] = (uint8_t)((position>>8)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+10] = (uint8_t)((position>>16)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+11] = (uint8_t)((position>>24)&0xff);
+      }else if((i==3)||(i==5)){
+        positon_step = (staus->position[i+2])/PI/2;  //弧度计算
+        position = -static_cast<int>(Pos_init_data[i+2]-positon_step*STM_ONE_CYCLE);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+6] = (i+9);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+7] = 0x1e;
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+8] = (uint8_t)(position&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+9] = (uint8_t)((position>>8)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+10] = (uint8_t)((position>>16)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+11] = (uint8_t)((position>>24)&0xff);
+      }else{
+        positon_step = (staus->position[i+2])/PI/2;  //弧度计算
+        position = static_cast<int>(Pos_init_data[i+2]-positon_step*STM_ONE_CYCLE);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+6] = (i+9);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+7] = 0x1e;
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+8] = (uint8_t)(position&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+9] = (uint8_t)((position>>8)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+10] = (uint8_t)((position>>16)&0xff);
+        send_data.cmd_data[i*MOTOR_JOINT_CMD_LEN+11] = (uint8_t)((position>>24)&0xff);
+      }
+  }
+ 
+
+
+  #ifdef IA_NEW_ROBOT
+  //发送肩部电机指令
+  send_data.cmd_type = CMD_TYPE_RS485_MOTOR;
+  send_data.cmd_command[0] = 0x00;
+  send_data.cmd_command[1] = 0x00;
+  send_data.cmd_len[0] = 0x00;
+  send_data.cmd_len[1] = 10; //发送长度
+
+  int rs485_position = (int)(staus->position[2])*1000;
+  send_data.cmd_data[0] = (uint8_t)((rs485_position)>>8)&0xff;
+  send_data.cmd_data[1] = (uint8_t)(rs485_position)&0xff;
   #ifdef IA_USE_TCP
     stm_all.tcp_truct_t.tcp_write((char*)&send_data,10); //发送tcp
   #else
@@ -1249,12 +1414,12 @@ void turn_on_robot::Robot_Data_Deal(char* data,int len){
           break;
         case 11:
           robot_joint_status.velocity[10] = 0.0;
-          robot_joint_status.position[10] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.position[10] = (float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x200;
           break; 
         case 12:
           robot_joint_status.velocity[11] = 0.0;
-          robot_joint_status.position[11] = -(float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
+          robot_joint_status.position[11] = (float)((data[11]<<24)+(data[10]<<16)+(data[9]<<8)+data[8])/262144.0*3.1415*2;
           joint_publish_flag |=0x400;
           break;
         case 13:
@@ -1275,9 +1440,9 @@ void turn_on_robot::Robot_Data_Deal(char* data,int len){
       }
   }else if(data[1]==CMD_TYPE_RS485_MOTOR){    //肩部电机
     robot_joint_status.velocity[7] = 0.0;
-    robot_joint_status.position[7] = (float)((data[6]<<8)+data[7]);
+    robot_joint_status.position[7] = (float)Odom_Trans(data[6],data[7]);
     robot_joint_status.velocity[8] = 0.0;
-    robot_joint_status.position[8] = -(float)((data[6]<<8)+data[7]);
+    robot_joint_status.position[8] = (float)Odom_Trans(data[6],data[7]);
   }else{
     if(data[6]==0x11){
       robot_joint_status.velocity[15] = WHEEL_FRONT_LEFT*Odom_Trans(data[9],data[10])*160.0/60.0*STM_PI;
