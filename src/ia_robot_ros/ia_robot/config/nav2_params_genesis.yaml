@@ -160,7 +160,7 @@ controller_server:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
       xy_goal_tolerance: 0.1  #xy 目标容差
-      yaw_goal_tolerance: 0.5 #yaw目标容差 TODO
+      yaw_goal_tolerance: 0.5 #yaw目标容差
 
 
     # DWB parameters - configured to prefer reversing in narrow spaces
@@ -204,7 +204,7 @@ controller_server:
       PathDist.scale: 32.0
       GoalDist.scale: 24.0
       RotateToGoal.scale: 10.0
-      RotateToGoal.slowing_factor: 1.0
+      RotateToGoal.slowing_factor: 0.1
       RotateToGoal.lookahead_time: -1.0
 
   
